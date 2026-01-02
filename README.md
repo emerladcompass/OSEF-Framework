@@ -1,5 +1,6 @@
 # 🧭 OSEF: Operational Stability Envelope Framework
 
+[![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![DOI](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FRJBDK-blue)](https://doi.org/10.17605/OSF.IO/RJBDK)
@@ -244,3 +245,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 ---
 
 🧭 *"Where disciplines converge • Where patterns emerge • Where safety evolves"* 🧭
+
+## 📊 Project Badges
+
+[![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/osef-framework.svg)](https://pypi.org/project/osef-framework/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI Status](https://github.com/emerladcompass/OSEF-Framework/workflows/CI/badge.svg)](https://github.com/emerladcompass/OSEF-Framework/actions)
