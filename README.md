@@ -184,6 +184,7 @@ echo 'conda activate osef' >> README.md
 echo '```' >> README.md
 ```
 
+
 ✅ Available on PyPI: osef-framework v0.1.0
 
 💻 Basic Usage
