@@ -256,3 +256,106 @@ else:
     print("   Data available for analysis in summary report above.")
 
 print("\n✅ Example completed successfully!\n")
+print("-" * 70)
+print(f"✓ Processing complete. {len(alerts_displayed)} alerts generated\n")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Summary Report
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+print("="*70)
+print("FLIGHT SUMMARY REPORT")
+print("="*70)
+
+report = osef.get_summary_report()
+
+print("\n📊 Overall Statistics:")
+print(f"  Total flight time: {report['summary']['total_time_monitored']:.1f} seconds")
+print(f"  Samples processed: {report['summary']['total_samples_processed']}")
+print(f"  Final state: {report['summary']['current_state']}")
+
+print("\n🎯 Creative Chaos Zone (CCZ) Analysis:")
+print(f"  CCZ entries: {report['ccz_statistics']['total_entries']}")
+print(f"  Total CCZ time: {report['ccz_statistics']['total_time_sec']:.1f} seconds")
+print(f"  Average CCZ duration: {report['ccz_statistics']['average_duration_sec']:.1f} seconds")
+print(f"  Successful LC recoveries: {report['ccz_statistics']['successful_recoveries']}")
+print(f"  Average recovery time: {report['ccz_statistics']['average_recovery_time_sec']:.1f} seconds")
+
+print("\n📈 Stability Metrics:")
+print(f"  Max λ observed: {report['stability_metrics']['max_lambda_observed']:.3f}")
+print(f"  Max deviation observed: {report['stability_metrics']['max_deviation_observed']:.2f}")
+print(f"  Chaos entries: {report['stability_metrics']['chaos_entries']}")
+print(f"  Current λ: {report['stability_metrics']['current_lambda']:.3f}")
+print(f"  Current d_LC: {report['stability_metrics']['current_d_LC']:.2f}")
+
+print("\n⚡ Performance:")
+print(f"  Average latency: {report['performance']['average_latency_ms']:.2f} ms")
+print(f"  Max latency: {report['performance']['max_latency_ms']:.2f} ms")
+print(f"  P99 latency: {report['performance']['p99_latency_ms']:.2f} ms")
+print(f"  Real-time capable: {'✓ YES' if report['performance']['realtime_capable'] else '✗ NO'}")
+
+print("\n🚨 Alerts:")
+print(f"  Total alerts: {report['alerts']['total_generated']}")
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Visualization
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+print("\n" + "="*70)
+
+if MATPLOTLIB_AVAILABLE and plt is not None:
+    print("Generating visualization...")
+    
+    fig, axes = plt.subplots(4, 1, figsize=(12, 10))
+    fig.suptitle('OSEF Flight Analysis', fontsize=16, fontweight='bold')
+
+    time_vals = [r['timestamp'] for r in results if r['timestamp'] is not None]
+    lambda_vals = [r['lambda'] for r in results if r['lambda'] is not None]
+    d_LC_vals = [r['d_LC'] for r in results if r['d_LC'] is not None]
+    
+    # Plot 1: Pitch and Bank
+    axes[0].plot(flight_data['time'], flight_data['P'], label='Pitch (P)', color='blue', linewidth=1)
+    axes[0].plot(flight_data['time'], flight_data['B'], label='Bank (B)', color='green', linewidth=1)
+    axes[0].axvline(x=100, color='red', linestyle='--', alpha=0.5, label='Disturbance')
+    axes[0].set_ylabel('Angle (degrees)')
+    axes[0].legend(loc='upper right')
+    axes[0].grid(True, alpha=0.3)
+    axes[0].set_title('Aircraft Attitude')
+
+    # Plot 2: Power
+    axes[1].plot(flight_data['time'], flight_data['W'], label='Power (W)', color='orange', linewidth=1)
+    axes[1].axvline(x=100, color='red', linestyle='--', alpha=0.5)
+    axes[1].set_ylabel('Power (normalized)')
+    axes[1].legend(loc='upper right')
+    axes[1].grid(True, alpha=0.3)
+    axes[1].set_title('Power/Memory State')
+
+    # Plot 3: Lyapunov Exponent
+    axes[2].plot(time_vals, lambda_vals, label='λ (Lyapunov)', color='purple', linewidth=1.5)
+    axes[2].axhline(y=0.01, color='green', linestyle=':', alpha=0.5, label='Stable LC threshold')
+    axes[2].axhline(y=0.5, color='red', linestyle=':', alpha=0.5, label='Chaos threshold')
+    axes[2].axhspan(0.01, 0.5, alpha=0.1, color='yellow', label='CCZ range')
+    axes[2].set_ylabel('λ')
+    axes[2].legend(loc='upper right')
+    axes[2].grid(True, alpha=0.3)
+    axes[2].set_title('Lyapunov Exponent (Stability Indicator)')
+
+    # Plot 4: Distance to LC
+    axes[3].plot(time_vals, d_LC_vals, label='d_LC (Distance to LC)', color='brown', linewidth=1.5)
+    axes[3].axhline(y=0.2, color='green', linestyle=':', alpha=0.5)
+    axes[3].axhline(y=0.8, color='red', linestyle=':', alpha=0.5)
+    axes[3].axhspan(0.2, 0.8, alpha=0.1, color='yellow')
+    axes[3].set_xlabel('Time (seconds)')
+    axes[3].set_ylabel('d_LC')
+    axes[3].legend(loc='upper right')
+    axes[3].grid(True, alpha=0.3)
+    axes[3].set_title('Deviation from Limit Cycle')
+
+    plt.tight_layout()
+    plt.savefig('flight_simulation_results.png', dpi=150)
+    print("✓ Visualization saved: flight_simulation_results.png")
+
+    plt.show()
+else:
+    print("📊 Skipping visualization (matplotlib not available)")
+    print("   Use the summary report above for analysis.")
+
+print("\n✅ Example completed successfully!\n")
