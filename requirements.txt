@@ -1,0 +1,43 @@
+# Core dependencies
+numpy>=1.21.2
+scipy>=1.7.1
+pandas>=1.3.3
+
+# Nonlinear dynamics
+nolds>=0.5.2
+
+# Visualization
+matplotlib>=3.4.3
+plotly>=5.3.1
+seaborn>=0.11.2
+
+# Data processing
+h5py>=3.6.0
+tables>=3.7.0
+
+# Scientific computing
+scikit-learn>=0.24.2
+statsmodels>=0.13.0
+
+# Optional: Machine Learning (for hybrid models)
+# Uncomment if needed:
+# tensorflow>=2.8.0
+# torch>=1.10.0
+
+# Development
+pytest>=6.2.5
+pytest-cov>=3.0.0
+black>=21.9b0
+flake8>=4.0.1
+mypy>=0.910
+
+# Documentation
+sphinx>=4.2.0
+sphinx-rtd-theme>=1.0.0
+nbsphinx>=0.8.7
+
+# Utilities
+tqdm>=4.62.3
+pyyaml>=6.0
+jsonschema>=4.1.0
+python-dateutil>=2.8.2

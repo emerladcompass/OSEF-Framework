@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the foundational research paper."
+title: "OSEF: Operational Stability Envelope Framework"
+version: 0.1.0
+date-released: 2026-01-01
+authors:
+  - family-names: Baladi
+    given-names: Samir
+    orcid: "https://orcid.org/0009-0003-8903-0029"
+    affiliation: "Emerald Compass"
+    email: emeraldcompass@gmail.com
+repository-code: "https://github.com/emeraldcompass/OSEF-Framework"
+url: "https://emeraldcompass.github.io/Aviation/"
+license: MIT
+keywords:
+  - aviation safety
+  - limit cycle dynamics
+  - real-time monitoring
+  - flight dynamics
+  - nonlinear dynamics
+  - lyapunov exponent
+  - creative chaos zones
+references:
+  - type: article
+    authors:
+      - family-names: Baladi
+        given-names: Samir
+    title: "Limit Cycle Flight Dynamics as a Framework for Adaptive Aviation Safety Protocols: A Study in Ethical-Technological Integration in Commercial Aviation"
+    year: 2026
+    doi: 10.17605/OSF.IO/RJBDK
+    url: "https://doi.org/10.17605/OSF.IO/RJBDK"
+    publisher: OSF
