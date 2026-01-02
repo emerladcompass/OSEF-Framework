@@ -8,7 +8,7 @@ try:
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
-    print("Note: pandas not available, using numpy alterna>
+    print("Note: pandas not available, using numpy alternative")
 from typing import Dict, Optional, List, Tuple
 import warnings
 import os
