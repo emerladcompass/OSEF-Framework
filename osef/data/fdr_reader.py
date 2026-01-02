@@ -11,7 +11,7 @@ except ImportError:
     PANDAS_AVAILABLE = False
     pd = None  # لاستخدامه لاحقاً
     print("Note: pandas not available, using numpy alternative")
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 import warnings
 import os
 
@@ -48,7 +48,7 @@ class FDRReader:
                  time_col: str = 'time',
                  pitch_col: Optional[str] = None,
                  bank_col: Optional[str] = None,
-                 power_col: Optional[str] = None) -> pd.DataFrame:
+                 power_col: Optional[str] = None) -> Optional[Any]:
         """
         Read FDR data from CSV file.
         
@@ -60,8 +60,12 @@ class FDRReader:
             power_col: Name of power column (auto-detect if None)
             
         Returns:
-            DataFrame with columns: time, P, B, W
+            DataFrame with columns: time, P, B, W or None if pandas not available
         """
+        if not PANDAS_AVAILABLE or pd is None:
+            print("⚠️  pandas not available for CSV reading")
+            return None
+            
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"File not found: {filepath}")
         
@@ -101,7 +105,7 @@ class FDRReader:
         
         return result
     
-    def read_hdf5(self, filepath: str) -> pd.DataFrame:
+    def read_hdf5(self, filepath: str) -> Optional[Any]:
         """
         Read FDR data from HDF5 file.
         
@@ -109,8 +113,12 @@ class FDRReader:
             filepath: Path to HDF5 file
             
         Returns:
-            DataFrame with columns: time, P, B, W
+            DataFrame with columns: time, P, B, W or None if pandas not available
         """
+        if not PANDAS_AVAILABLE or pd is None:
+            print("⚠️  pandas not available for HDF5 reading")
+            return None
+            
         try:
             import h5py
         except ImportError:
@@ -171,6 +179,9 @@ class FDRReader:
         Returns:
             Resampled DataFrame
         """
+        if not PANDAS_AVAILABLE or pd is None:
+            return df
+            
         # Check current sampling rate
         time_diffs = np.diff(df['time'])
         current_dt = np.median(time_diffs)
@@ -195,40 +206,76 @@ class FDRReader:
         return result
     
     def extract_pbw(self, 
-                    df: pd.DataFrame,
+                    df: Optional[Any],
                     normalize_power: bool = True) -> Dict[str, np.ndarray]:
         """
         Extract P, B, W as numpy arrays.
         
         Args:
-            df: DataFrame with time, P, B, W columns
+            df: DataFrame with time, P, B, W columns (or dict/list)
             normalize_power: Normalize W to 0-1 range
             
         Returns:
             Dictionary with 'time', 'P', 'B', 'W' arrays
         """
-        result = {
-            'time': df['time'].values,
-            'P': df['P'].values,
-            'B': df['B'].values,
-            'W': df['W'].values
-        }
+        if df is None:
+            # Return empty arrays
+            return {
+                'time': np.array([]),
+                'P': np.array([]),
+                'B': np.array([]),
+                'W': np.array([])
+            }
+            
+        # Handle different input types
+        if PANDAS_AVAILABLE and isinstance(df, pd.DataFrame):
+            # pandas DataFrame
+            result = {
+                'time': df['time'].values,
+                'P': df['P'].values,
+                'B': df['B'].values,
+                'W': df['W'].values
+            }
+        elif isinstance(df, dict):
+            # Dictionary
+            result = {
+                'time': np.array(df.get('time', [])),
+                'P': np.array(df.get('P', [])),
+                'B': np.array(df.get('B', [])),
+                'W': np.array(df.get('W', []))
+            }
+        else:
+            # Try to convert
+            try:
+                result = {
+                    'time': np.array([row[0] for row in df]),
+                    'P': np.array([row[1] for row in df]),
+                    'B': np.array([row[2] for row in df]),
+                    'W': np.array([row[3] for row in df])
+                }
+            except:
+                raise ValueError("Could not extract P, B, W from input")
         
         # Normalize power to 0-1 if needed
-        if normalize_power and result['W'].max() > 1.5:
+        if (normalize_power and len(result['W']) > 0 and 
+            result['W'].max() > 1.5):
             # Assume power is in percent (0-100)
             result['W'] = result['W'] / 100.0
         
         return result
 
 
-def load_sample_fdr() -> pd.DataFrame:
+def load_sample_fdr() -> Optional[Any]:
     """
     Load sample FDR data for testing.
     
     Returns:
-        Sample DataFrame
+        Sample DataFrame or None if pandas not available
     """
+    if not PANDAS_AVAILABLE or pd is None:
+        print("⚠️  pandas not available for sample data")
+        return None
+        
     # Path to sample data
     sample_path = os.path.join(
         os.path.dirname(__file__),
