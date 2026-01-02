@@ -151,28 +151,6 @@ conda env create -f environment.yml
 conda activate osef
 ```
 
-```bash
-echo '## Installation' >> README.md
-echo '' >> README.md
-echo '### Install from PyPI (Recommended)' >> README.md
-echo '```bash' >> README.md
-echo 'pip install osef-framework' >> README.md
-echo '```' >> README.md
-echo '✅ **Package published on PyPI: `osef-framework v0.1.0`**' >> README.md
-echo '' >> README.md
-echo '### Install from source' >> README.md
-echo '```bash' >> README.md
-echo 'git clone https://github.com/emerladcompass/OSEF-Framework.git' >> README.md
-echo 'cd OSEF-Framework' >> README.md
-echo 'pip install -r requirements.txt  # Optional dependencies' >> README.md
-echo '' >> README.md
-echo '# OR using conda' >> README.md
-echo 'conda env create -f environment.yml' >> README.md
-echo 'conda activate osef' >> README.md
-echo '```' >> README.md
-```
-
-
 ✅ Available on PyPI: 
 
 osef-framework v0.1.0
