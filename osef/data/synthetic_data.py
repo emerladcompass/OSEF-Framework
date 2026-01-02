@@ -1,169 +1,88 @@
 """
-Synthetic flight data generation for testing
+Synthetic flight data generation for OSEF testing.
 """
 
 import numpy as np
+from typing import Dict, Optional, Any
+
 try:
     import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
+    pd = None
     print("Note: pandas not available, using numpy alternative")
-from typing import Dict, Optional, Any, List, Tuple
-import warnings
-import os
 
 
-def generate_synthetic_flight(duration: float = 300,
-                              sampling_rate: float = 8.0,
-                              include_disturbance: bool = True,
-                              disturbance_time: Optional[float] = None,
-                              noise_level: float = 0.1)
+def generate_synthetic_flight(duration=300.0, sampling_rate=8.0, include_disturbance=True, disturbance_time=100.0):
     """
-    Generate synthetic flight data for testing OSEF.
-    
-    Creates a trajectory that:
-    1. Starts near limit cycle
-    2. Includes a disturbance event (optional)
-    3. Returns to limit cycle
+    Generate synthetic flight data for testing.
     
     Args:
         duration: Flight duration in seconds
         sampling_rate: Sampling rate in Hz
-        include_disturbance: Include disturbance event
-        disturbance_time: When disturbance occurs (default: duration/3)
-        noise_level: Measurement noise level
+        include_disturbance: Include engine failure disturbance
+        disturbance_time: Time of disturbance in seconds
         
     Returns:
-        DataFrame with time, P, B, W columns
+        Flight data as DataFrame or dict
     """
-    dt = 1.0 / sampling_rate
-    n_points = int(duration * sampling_rate)
-    time = np.arange(n_points) * dt
+    # Calculate number of samples
+    n_samples = int(duration * sampling_rate)
     
-    # Limit cycle parameters (from Baladi et al.)
-    T_period = 5.1  # seconds
-    omega = 2 * np.pi / T_period
+    # Generate time vector
+    time = np.linspace(0, duration, n_samples)
     
-    # Base limit cycle trajectory
-    P_base = 0.5 * np.sin(omega * time)
-    B_base = 1.3 * np.sin(omega * time - np.pi/4)
-    W_base = 0.8 + 0.02 * np.sin(omega * time - np.pi/2)
+    # Generate nominal flight parameters
+    P = 2.0 + 0.5 * np.sin(time/10) + 0.1 * np.random.randn(n_samples)
+    B = -3.0 + 1.0 * np.cos(time/15) + 0.1 * np.random.randn(n_samples)
+    W = np.full_like(time, 0.8)  # Normal power
     
-    # Add disturbance if requested
+    # Add disturbance (engine failure)
     if include_disturbance:
-        if disturbance_time is None:
-            disturbance_time = duration / 3
-        
-        dist_start = int(disturbance_time * sampling_rate)
-        dist_duration = int(50 * sampling_rate)  # 50 seconds
-        dist_end = min(dist_start + dist_duration, n_points)
-        
-        # Disturbance envelope (ramps up then down)
-        dist_env = np.zeros(n_points)
-        ramp_up = np.linspace(0, 1, dist_duration // 3)
-        steady = np.ones(dist_duration // 3)
-        ramp_down = np.linspace(1, 0, dist_duration - 2*(dist_duration // 3))
-        
-        envelope = np.concatenate([ramp_up, steady, ramp_down])
-        envelope = envelope[:dist_end - dist_start]
-        dist_env[dist_start:dist_end] = envelope
-        
-        # Add disturbance
-        P_base += dist_env * 3.0
-        B_base += dist_env * 5.0
-        W_base -= dist_env * 0.15
+        disturbance_idx = np.where(time >= disturbance_time)[0][0]
+        # Sudden power loss
+        W[disturbance_idx:] = 0.3 + 0.1 * np.random.randn(n_samples - disturbance_idx)
+        # Increased oscillations in pitch
+        P[disturbance_idx:] += 3.0 * np.sin(time[disturbance_idx:]/5)
+        # Bank angle disturbance
+        B[disturbance_idx:] -= 5.0 * np.exp(-(time[disturbance_idx:] - disturbance_time)/20.0)
     
-    # Add measurement noise
-    P = P_base + np.random.randn(n_points) * noise_level
-    B = B_base + np.random.randn(n_points) * noise_level
-    W = W_base + np.random.randn(n_points) * (noise_level * 0.05)
+    # Add noise
+    P += 0.05 * np.random.randn(n_samples)
+    B += 0.05 * np.random.randn(n_samples)
     
-    # Clip to valid ranges
-    P = np.clip(P, -10, 30)
-    B = np.clip(B, -60, 60)
-    W = np.clip(W, 0, 1)
-    
-    return pd.DataFrame({
-        'time': time,
-        'P': P,
-        'B': B,
-        'W': W
-    })
-
-
-def generate_ccz_scenario(scenario: str = 'engine_failure')
-    """
-    Generate specific CCZ scenario for testing.
-    
-    Scenarios:
-    - 'engine_failure': Engine failure at V1
-    - 'weather': Sudden weather deterioration
-    - 'automation': Automation mismatch
-    
-    Args:
-        scenario: Scenario name
-        
-    Returns:
-        DataFrame with scenario data
-    """
-    if scenario == 'engine_failure':
-        return _generate_engine_failure()
-    elif scenario == 'weather':
-        return _generate_weather_scenario()
-    elif scenario == 'automation':
-        return _generate_automation_mismatch()
+    # Package data
+    if PANDAS_AVAILABLE and pd is not None:
+        data = pd.DataFrame({
+            'time': time,
+            'P': P,
+            'B': B,
+            'W': W
+        })
     else:
-        raise ValueError(f"Unknown scenario: {scenario}")
+        data = {
+            'time': time,
+            'P': P,
+            'B': B,
+            'W': W
+        }
+    
+    return data
 
 
-def _generate_engine_failure()
-    """Engine failure during takeoff."""
-    duration = 120  # 2 minutes
-    df = generate_synthetic_flight(
-        duration=duration,
-        include_disturbance=True,
-        disturbance_time=10.0  # 10 seconds after start
-    )
+def create_simple_flight_data():
+    """
+    Create simple flight data without any dependencies.
     
-    # Simulate engine failure effects
-    failure_idx = int(10 * 8)  # 8 Hz sampling
+    Returns:
+        Dictionary with time, P, B, W arrays
+    """
+    time = np.linspace(0, 60, 480)  # 1 minute at 8 Hz
     
-    # Asymmetric thrust
-    df.loc[failure_idx:, 'B'] += 5.0  # Bank correction needed
-    df.loc[failure_idx:, 'W'] *= 0.85  # Reduced power
-    
-    return df
-
-
-def _generate_weather_scenario()
-    """Sudden weather deterioration on approach."""
-    duration = 180  # 3 minutes
-    df = generate_synthetic_flight(
-        duration=duration,
-        include_disturbance=True,
-        disturbance_time=90.0  # Halfway through
-    )
-    
-    # Turbulence effects
-    turb_start = int(90 * 8)
-    df.loc[turb_start:, 'P'] += np.random.randn(len(df) - turb_start) * 0.5
-    df.loc[turb_start:, 'B'] += np.random.randn(len(df) - turb_start) * 1.5
-    
-    return df
-
-
-def _generate_automation_mismatch()
-    """Automation commands unexpected maneuver."""
-    duration = 150
-    df = generate_synthetic_flight(
-        duration=duration,
-        include_disturbance=True,
-        disturbance_time=60.0
-    )
-    
-    # Sudden automation input
-    auto_idx = int(60 * 8)
-    df.loc[auto_idx:auto_idx+40, 'B'] += 10.0  # Unexpected bank
-    
-    return df
+    return {
+        'time': time,
+        'P': 2.0 + 0.5 * np.sin(time/10),
+        'B': -3.0 + 1.0 * np.cos(time/15),
+        'W': np.full_like(time, 0.8)
+    }
