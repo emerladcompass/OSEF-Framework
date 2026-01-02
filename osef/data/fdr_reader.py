@@ -11,7 +11,7 @@ except ImportError:
     PANDAS_AVAILABLE = False
     pd = None
     print("Note: pandas not available, using numpy alternative")
-from typing import Dict, Optional, List, Tuple, Any
+from typing import Dict, Optional, List, Tuple, Any, Any
 import warnings
 import os
 
