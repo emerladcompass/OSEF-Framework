@@ -61,7 +61,7 @@ for i in range(80):  # 80 samples at 8 Hz = 10 seconds
     # Print every second
     if i % 8 == 0:
         print(f"[t={t:5.1f}s] State: {result['state']:20s} "
-              f"λ={result['lambda']:6.3f} d_LC={result['d_LC']:5.2f}")
+              f"λ={result['lambda'] if result['lambda'] is not None else 'N/A':>6} d_LC={result['d_LC']:5.2f}")
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Step 4: Get Summary Report

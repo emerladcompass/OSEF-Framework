@@ -3,8 +3,14 @@ Data preprocessing utilities
 """
 
 import numpy as np
-import pandas as pd
-from typing import Dict, Tuple, Optional
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    pd = None  # لاستخدامه لاحقاً
+    print("Note: pandas not available, using numpy alternative")
+from typing import Dict, Optional, List, Tuple
 from scipy.signal import butter, filtfilt
 import warnings
 

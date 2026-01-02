@@ -3,8 +3,15 @@ Synthetic flight data generation for testing
 """
 
 import numpy as np
-import pandas as pd
-from typing import Optional, Dict
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    print("Note: pandas not available, using numpy alterna>
+from typing import Dict, Optional, List, Tuple
+import warnings
+import os
 
 
 def generate_synthetic_flight(duration: float = 300,

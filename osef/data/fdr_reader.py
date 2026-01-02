@@ -4,7 +4,13 @@ Handles reading and parsing FDR data from various formats
 """
 
 import numpy as np
-import pandas as pd
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+    pd = None  # لاستخدامه لاحقاً
+    print("Note: pandas not available, using numpy alternative")
 from typing import Dict, Optional, List, Tuple
 import warnings
 import os
