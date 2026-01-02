@@ -1,252 +1,222 @@
 """
-Data preprocessing utilities
+Data preprocessing utilities for FDR data.
 """
 
 import numpy as np
+from typing import Dict, List, Optional, Union, Any
+
 try:
     import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
-    pd = None  # لاستخدامه لاحقاً
-    print("Note: pandas not available, using numpy alternative")
-from typing import Dict, Optional, List, Tuple
-from scipy.signal import butter, filtfilt
-import warnings
+    pd = None
 
 
-def preprocess_fdr_data(df: pd.DataFrame,
-                       remove_outliers: bool = True,
-                       filter_data: bool = True,
-                       fill_gaps: bool = True) -> pd.DataFrame:
+def preprocess_fdr_data(df: Any, 
+                       time_col: str = 'time',
+                       pitch_col: str = 'P',
+                       bank_col: str = 'B',
+                       power_col: str = 'W',
+                       resample_rate: Optional[float] = None,
+                       smooth: bool = True):
     """
     Preprocess FDR data for OSEF analysis.
     
-    Steps:
-    1. Remove outliers
-    2. Fill gaps (interpolation)
-    3. Apply low-pass filter
-    4. Validate ranges
-    
     Args:
-        df: DataFrame with time, P, B, W columns
-        remove_outliers: Remove statistical outliers
-        filter_data: Apply low-pass filter
-        fill_gaps: Interpolate small gaps
+        df: Input data (DataFrame, dict, or list)
+        time_col: Name of time column
+        pitch_col: Name of pitch column
+        bank_col: Name of bank column
+        power_col: Name of power column
+        resample_rate: Target sampling rate in Hz
+        smooth: Apply smoothing filter
         
     Returns:
-        Preprocessed DataFrame
+        Preprocessed data
     """
-    df = df.copy()
+    # Convert input to numpy arrays
+    if PANDAS_AVAILABLE and pd is not None and isinstance(df, pd.DataFrame):
+        time = df[time_col].values
+        pitch = df[pitch_col].values
+        bank = df[bank_col].values
+        power = df[power_col].values
+    elif isinstance(df, dict):
+        time = np.array(df.get(time_col, df.get('time', [])))
+        pitch = np.array(df.get(pitch_col, df.get('P', [])))
+        bank = np.array(df.get(bank_col, df.get('B', [])))
+        power = np.array(df.get(power_col, df.get('W', [])))
+    else:
+        raise ValueError("Unsupported input type")
     
-    # 1. Remove outliers
-    if remove_outliers:
-        df = _remove_outliers(df)
+    # Check data
+    if len(time) == 0:
+        raise ValueError("No data provided")
     
-    # 2. Fill gaps
-    if fill_gaps:
-        df = _fill_gaps(df)
+    # Remove outliers (3-sigma filter)
+    pitch = _remove_outliers(pitch)
+    bank = _remove_outliers(bank)
+    power = _remove_outliers(power)
     
-    # 3. Filter
-    if filter_data:
-        df = _apply_filter(df)
+    # Apply smoothing if requested
+    if smooth:
+        pitch = _smooth_data(pitch)
+        bank = _smooth_data(bank)
+        power = _smooth_data(power)
     
-    # 4. Validate
-    df = _validate_ranges(df)
+    # Resample if requested
+    if resample_rate is not None:
+        time, pitch = _resample_uniform(time, pitch, resample_rate)
+        _, bank = _resample_uniform(time, bank, resample_rate)
+        _, power = _resample_uniform(time, power, resample_rate)
     
-    return df
-
-
-def _remove_outliers(df: pd.DataFrame, 
-                    n_std: float = 3.0) -> pd.DataFrame:
-    """
-    Remove statistical outliers using z-score method.
-    
-    Args:
-        df: Input DataFrame
-        n_std: Number of standard deviations for outlier threshold
-        
-    Returns:
-        DataFrame with outliers removed (NaN)
-    """
-    for col in ['P', 'B', 'W']:
-        mean = df[col].mean()
-        std = df[col].std()
-        
-        # Mark outliers as NaN
-        outliers = np.abs(df[col] - mean) > (n_std * std)
-        df.loc[outliers, col] = np.nan
-        
-        if outliers.sum() > 0:
-            warnings.warn(f"Removed {outliers.sum()} outliers from {col}")
-    
-    return df
-
-
-def _fill_gaps(df: pd.DataFrame, 
-              max_gap_seconds: float = 5.0) -> pd.DataFrame:
-    """
-    Fill small gaps using linear interpolation.
-    
-    Args:
-        df: Input DataFrame
-        max_gap_seconds: Maximum gap size to fill
-        
-    Returns:
-        DataFrame with gaps filled
-    """
-    # Compute time differences
-    time_diffs = np.diff(df['time'])
-    median_dt = np.median(time_diffs)
-    max_gap_samples = int(max_gap_seconds / median_dt)
-    
-    # Interpolate each column
-    for col in ['P', 'B', 'W']:
-        df[col] = df[col].interpolate(
-            method='linear',
-            limit=max_gap_samples,
-            limit_direction='both'
-        )
-    
-    return df
-
-
-def _apply_filter(df: pd.DataFrame,
-                 cutoff_hz: float = 2.0,
-                 order: int = 4) -> pd.DataFrame:
-    """
-    Apply low-pass Butterworth filter to remove high-frequency noise.
-    
-    Args:
-        df: Input DataFrame
-        cutoff_hz: Cutoff frequency in Hz
-        order: Filter order
-        
-    Returns:
-        Filtered DataFrame
-    """
-    # Determine sampling rate
-    time_diffs = np.diff(df['time'])
-    fs = 1.0 / np.median(time_diffs)
-    
-    # Design filter
-    nyquist = fs / 2.0
-    normal_cutoff = cutoff_hz / nyquist
-    
-    if normal_cutoff >= 1.0:
-        warnings.warn(f"Cutoff frequency too high ({cutoff_hz} Hz), skipping filter")
-        return df
-    
-    b, a = butter(order, normal_cutoff, btype='low', analog=False)
-    
-    # Apply to each column
-    for col in ['P', 'B', 'W']:
-        # Only filter if no NaN
-        if not df[col].isna().any():
-            df[col] = filtfilt(b, a, df[col])
-    
-    return df
-
-
-def _validate_ranges(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Validate and clip values to physically reasonable ranges.
-    
-    Args:
-        df: Input DataFrame
-        
-    Returns:
-        Validated DataFrame
-    """
-    # Typical ranges
-    ranges = {
-        'P': (-10, 30),   # Pitch: -10° to +30°
-        'B': (-60, 60),   # Bank: -60° to +60°
-        'W': (0, 1.2)     # Power: 0 to 120% (allow slight overshoot)
+    # Package results
+    result = {
+        'time': time,
+        'P': pitch,
+        'B': bank,
+        'W': power
     }
     
-    for col, (min_val, max_val) in ranges.items():
-        # Count violations
-        violations = (df[col] < min_val) | (df[col] > max_val)
-        if violations.sum() > 0:
-            warnings.warn(f"{violations.sum()} values outside range for {col}")
-        
-        # Clip
-        df[col] = np.clip(df[col], min_val, max_val)
+    # Convert back to DataFrame if input was DataFrame
+    if PANDAS_AVAILABLE and pd is not None and isinstance(df, pd.DataFrame):
+        result = pd.DataFrame(result)
     
-    return df
+    return result
 
 
-def normalize_state(P: float, B: float, W: float) -> np.ndarray:
+def _remove_outliers(data: np.ndarray, sigma_threshold: float = 3.0) -> np.ndarray:
     """
-    Normalize state vector to standard scale.
-    
-    Normalization:
-    - P: degrees (no change)
-    - B: degrees (no change)
-    - W: 0-1 (ensure normalized)
+    Remove outliers using sigma clipping.
     
     Args:
-        P: Pitch angle (degrees)
-        B: Bank angle (degrees)
-        W: Power (0-1 or 0-100)
+        data: Input array
+        sigma_threshold: Threshold for outlier removal
         
     Returns:
-        Normalized state vector [P, B, W]
+        Filtered array
     """
-    # Normalize W if needed
-    if W > 1.5:
-        W = W / 100.0
+    if len(data) == 0:
+        return data
     
-    return np.array([P, B, W])
+    mean = np.mean(data)
+    std = np.std(data)
+    
+    if std == 0:
+        return data
+    
+    # Replace outliers with median
+    mask = np.abs(data - mean) < sigma_threshold * std
+    median_val = np.median(data[mask])
+    
+    result = data.copy()
+    result[~mask] = median_val
+    
+    return result
 
 
-def compute_derivatives(df: pd.DataFrame) -> pd.DataFrame:
+def _smooth_data(data: np.ndarray, window_size: int = 5) -> np.ndarray:
     """
-    Compute time derivatives of P, B, W.
+    Apply simple moving average smoothing.
     
     Args:
-        df: DataFrame with time, P, B, W
+        data: Input array
+        window_size: Size of moving average window
         
     Returns:
-        DataFrame with added dP, dB, dW columns
+        Smoothed array
     """
-    df = df.copy()
+    if len(data) <= window_size:
+        return data
     
-    # Compute dt
-    dt = np.diff(df['time'])
+    window = np.ones(window_size) / window_size
+    smoothed = np.convolve(data, window, mode='same')
     
-    # Compute derivatives (forward difference)
-    for col in ['P', 'B', 'W']:
-        diff = np.diff(df[col])
-        rate = diff / dt
-        
-        # Pad with zero at the end
-        rate = np.append(rate, 0)
-        
-        df[f'd{col}'] = rate
+    # Handle edges
+    for i in range(window_size // 2):
+        smoothed[i] = np.mean(data[:i + window_size // 2 + 1])
+        smoothed[-i-1] = np.mean(data[-i - window_size // 2 - 1:])
     
-    return df
+    return smoothed
 
 
-def segment_by_phase(df: pd.DataFrame,
-                     phase_col: str = 'phase') -> Dict[str, pd.DataFrame]:
+def _resample_uniform(time: np.ndarray, data: np.ndarray, target_rate: float) -> tuple:
     """
-    Segment data by flight phase.
+    Resample data to uniform sampling rate.
     
     Args:
-        df: DataFrame with flight phase column
-        phase_col: Name of phase column
+        time: Original time vector
+        data: Original data
+        target_rate: Target sampling rate in Hz
         
     Returns:
-        Dictionary mapping phase name to DataFrame segment
+        Tuple of (new_time, resampled_data)
     """
-    if phase_col not in df.columns:
-        warnings.warn(f"Phase column '{phase_col}' not found")
-        return {'full_flight': df}
+    if len(time) < 2:
+        return time, data
     
-    segments = {}
-    for phase in df[phase_col].unique():
-        segments[phase] = df[df[phase_col] == phase].copy()
+    # Create uniform time grid
+    t_start = time[0]
+    t_end = time[-1]
+    dt = 1.0 / target_rate
+    n_points = int((t_end - t_start) * target_rate) + 1
+    time_uniform = np.linspace(t_start, t_end, n_points)
     
-    return segments
+    # Interpolate data
+    data_resampled = np.interp(time_uniform, time, data)
+    
+    return time_uniform, data_resampled
+
+
+def normalize_power(power_data: np.ndarray) -> np.ndarray:
+    """
+    Normalize power data to 0-1 range.
+    
+    Args:
+        power_data: Power data (could be in percent or absolute)
+        
+    Returns:
+        Normalized power (0-1)
+    """
+    if len(power_data) == 0:
+        return power_data
+    
+    # If data looks like percentages (0-100), normalize
+    if np.max(power_data) > 1.5:
+        power_norm = power_data / 100.0
+        # Clip to 0-1
+        power_norm = np.clip(power_norm, 0.0, 1.0)
+        return power_norm
+    
+    # Already normalized or unknown scale
+    return power_data
+
+
+def compute_derivatives(time: np.ndarray, data: np.ndarray) -> np.ndarray:
+    """
+    Compute time derivatives of data.
+    
+    Args:
+        time: Time vector
+        data: Data vector
+        
+    Returns:
+        Derivative vector
+    """
+    if len(time) < 2 or len(data) < 2:
+        return np.zeros_like(data)
+    
+    # Compute dt for each point
+    dt = np.diff(time)
+    # Handle zero or negative dt
+    dt = np.where(dt <= 0, np.mean(dt[dt > 0]) if np.any(dt > 0) else 1.0, dt)
+    
+    # Compute derivative
+    derivative = np.zeros_like(data)
+    derivative[:-1] = np.diff(data) / dt
+    
+    # Last point uses backward difference
+    if len(data) > 1:
+        derivative[-1] = (data[-1] - data[-2]) / dt[-1] if len(dt) > 0 else 0
+    
+    return derivative
