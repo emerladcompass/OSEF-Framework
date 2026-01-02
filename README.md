@@ -194,7 +194,7 @@ OSEF Framework:
   author = {Baladi, Samir},
   title = {OSEF: Operational Stability Envelope Framework},
   year = {2026},
-  url = {[https://github.com/emeraldcompass/OSEF-Framework](https://github.com/emeraldcompass/OSEF-Framework)}
+  url = {[https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)}
 }
 
 ```
@@ -227,10 +227,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 ---
 
 ### 📊 Project Stats
-![Repo Size](https://img.shields.io/github/repo-size/emeraldcompass/OSEF-Framework)
-![Issues](https://img.shields.io/github/issues/emeraldcompass/OSEF-Framework)
-![Forks](https://img.shields.io/github/forks/emeraldcompass/OSEF-Framework)
-![Stars](https://img.shields.io/github/stars/emeraldcompass/OSEF-Framework)
+![Repo Size](https://img.shields.io/github/repo-size/emerladcompass/OSEF-Framework)
+![Issues](https://img.shields.io/github/issues/emerladcompass/OSEF-Framework)
+![Forks](https://img.shields.io/github/forks/emerladcompass/OSEF-Framework)
+![Stars](https://img.shields.io/github/stars/emerladcompass/OSEF-Framework)
 
 ---
 
