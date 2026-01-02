@@ -244,11 +244,3 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 ---
 
 🧭 *"Where disciplines converge • Where patterns emerge • Where safety evolves"* 🧭
-
-## 🚀 Installation
-
-```bash
-pip install osef-framework
-```
-
-✅ **Package published on [PyPI](https://pypi.org/project/osef-framework/)**
