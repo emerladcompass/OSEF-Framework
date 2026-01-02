@@ -9,7 +9,7 @@ try:
 except ImportError:
     PANDAS_AVAILABLE = False
     print("Note: pandas not available, using numpy alternative")
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, Any, List, Tuple
 import warnings
 import os
 
@@ -18,7 +18,7 @@ def generate_synthetic_flight(duration: float = 300,
                               sampling_rate: float = 8.0,
                               include_disturbance: bool = True,
                               disturbance_time: Optional[float] = None,
-                              noise_level: float = 0.1) -> pd.DataFrame:
+                              noise_level: float = 0.1)
     """
     Generate synthetic flight data for testing OSEF.
     
@@ -92,7 +92,7 @@ def generate_synthetic_flight(duration: float = 300,
     })
 
 
-def generate_ccz_scenario(scenario: str = 'engine_failure') -> pd.DataFrame:
+def generate_ccz_scenario(scenario: str = 'engine_failure')
     """
     Generate specific CCZ scenario for testing.
     
@@ -117,7 +117,7 @@ def generate_ccz_scenario(scenario: str = 'engine_failure') -> pd.DataFrame:
         raise ValueError(f"Unknown scenario: {scenario}")
 
 
-def _generate_engine_failure() -> pd.DataFrame:
+def _generate_engine_failure()
     """Engine failure during takeoff."""
     duration = 120  # 2 minutes
     df = generate_synthetic_flight(
@@ -136,7 +136,7 @@ def _generate_engine_failure() -> pd.DataFrame:
     return df
 
 
-def _generate_weather_scenario() -> pd.DataFrame:
+def _generate_weather_scenario()
     """Sudden weather deterioration on approach."""
     duration = 180  # 3 minutes
     df = generate_synthetic_flight(
@@ -153,7 +153,7 @@ def _generate_weather_scenario() -> pd.DataFrame:
     return df
 
 
-def _generate_automation_mismatch() -> pd.DataFrame:
+def _generate_automation_mismatch()
     """Automation commands unexpected maneuver."""
     duration = 150
     df = generate_synthetic_flight(
