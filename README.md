@@ -129,27 +129,14 @@ OSEF-Framework/
 
 ### 📦 Installation
 
-```bash
-# Clone repository
-git clone [https://github.com/emerladcompass/OSEF-Framework.git](https://github.com/emeraldcompass/OSEF-Framework.git)
-cd OSEF-Framework
-
-# Install dependencies
-pip install -r requirements.txt
-
-# OR use conda
-conda env create -f environment.yml
-conda activate osef
-```
-Installation
-
 Install from PyPI (Recommended)
 
 ```bash
 pip install osef-framework
 ```
 
-✅ Package published on PyPI: osef-framework v0.1.0
+✅ Package published on PyPI: o
+sef-framework v0.1.0
 
 Install from source
 
@@ -185,7 +172,8 @@ echo '```' >> README.md
 ```
 
 
-✅ Available on PyPI: osef-framework v0.1.0
+✅ Available on PyPI: o
+sef-framework v0.1.0
 
 💻 Basic Usage
 ```
