@@ -1,90 +1,81 @@
+#!/usr/bin/env python
 """
-Example 1: Basic OSEF Usage
-Demonstrates the simplest way to use OSEF
+01_basic_usage.py - Basic OSEF Usage
+Simple working example
 """
 
 import sys
-sys.path.insert(0, '..')  # Add parent directory to path
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + '/..')
 
-from osef import LimitCycleModel, OSEF, print_banner
-import numpy as np
+def safe_format(value, format_str):
+    """Safely format a value that might be None"""
+    if value is None:
+        return "N/A"
+    try:
+        return format_str.format(value)
+    except:
+        return str(value)
 
-# Print OSEF banner
-print_banner()
-
-print("\n" + "="*60)
-print("Example 1: Basic OSEF Usage")
-print("="*60 + "\n")
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Step 1: Create Limit Cycle Model
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-print("Step 1: Loading pre-calibrated Limit Cycle Model...")
-lc_model = LimitCycleModel.from_baladi_params(phase="approach")
-print(f"✓ Model loaded: {lc_model}")
-
-# Compute limit cycle
-print("\nComputing reference limit cycle...")
-lc_model.compute_limit_cycle(duration=500, verbose=True)
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Step 2: Initialize OSEF
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-print("\n" + "-"*60)
-print("Step 2: Initializing OSEF...")
-osef = OSEF(lc_model, window_size=100, sampling_rate=8.0, verbose=True)
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Step 3: Process some sample data
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-print("\n" + "-"*60)
-print("Step 3: Processing sample flight data...")
-print("-"*60)
-
-# Simulate 10 seconds of flight near limit cycle
-for i in range(80):  # 80 samples at 8 Hz = 10 seconds
-    t = i / 8.0
+def main():
+    print("🧭 OSEF Framework - Basic Usage Example")
+    print("=" * 60)
     
-    # State near limit cycle (small oscillations)
-    P = 0.5 * np.sin(2 * np.pi * t / 5.1)
-    B = 1.3 * np.sin(2 * np.pi * t / 5.1 - np.pi/4)
-    W = 0.8 + 0.02 * np.sin(2 * np.pi * t / 5.1 - np.pi/2)
-    
-    # Add small noise
-    P += np.random.randn() * 0.05
-    B += np.random.randn() * 0.1
-    W += np.random.randn() * 0.01
-    
-    # Process through OSEF
-    result = osef.process_sample(t, P, B, W)
-    
-    # Print every second
-    if i % 8 == 0:
-        print(f"[t={t:5.1f}s] State: {result['state']:20s} "
-              lambda_val = result['lambda'] if result['lambda'] is not None else 'N/A'
-d_lc_val = result['d_LC'] if result['d_LC'] is not None else 'N/A'
-if d_lc_val != 'N/A':
-    d_lc_str = f"{d_lc_val:5.2f}"
-else:
-    d_lc_str = 'N/A'
-f"λ={lambda_val:>6} d_LC={d_lc_str}")
+    try:
+        # Import OSEF
+        import osef
+        osef.print_banner()
+        
+        # Import core components
+        from osef.core.limit_cycle_model import LimitCycleModel
+        from osef.core.stability_monitor import OSEF
+        
+        print("\n1. Creating Limit Cycle Model...")
+        model = LimitCycleModel.from_baladi_params()
+        model.compute_limit_cycle()
+        params = model.get_parameters()
+        print(f"   ✓ Model created: μ={params['mu']:.3f}, ω₀={params['omega_0']:.3f}")
+        
+        print("\n2. Initializing OSEF Monitor...")
+        monitor = OSEF(model, sampling_rate=8)
+        print(f"   ✓ Monitor: {monitor}")
+        
+        print("\n3. Processing Sample Data...")
+        print("   " + "-" * 40)
+        
+        # Sample flight data
+        samples = [
+            {"t": 0.0, "P": 0.0, "B": 0.0, "W": 0.8},
+            {"t": 1.0, "P": 1.5, "B": -2.3, "W": 0.82},
+            {"t": 2.0, "P": 2.1, "B": -3.7, "W": 0.78},
+            {"t": 3.0, "P": 1.8, "B": -2.9, "W": 0.81},
+        ]
+        
+        for sample in samples:
+            result = monitor.process_sample(**sample)
+            
+            # Safe extraction
+            state = result.get('state', 'Unknown')
+            lambda_val = result.get('lambda')
+            d_lc_val = result.get('d_LC')
+            
+            # Safe formatting
+            lambda_str = safe_format(lambda_val, "{:6.3f}")
+            d_lc_str = safe_format(d_lc_val, "{:5.2f}")
+            
+            print(f"   t={sample['t']:4.1f}s | State: {state:15} | "
+                  f"λ={lambda_str:>6} | d_LC={d_lc_str:>5}")
+        
+        print("\n" + "=" * 60)
+        print("✅ Example Completed Successfully!")
+        print("=" * 60)
+        return 0
+        
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Step 4: Get Summary Report
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-print("\n" + "="*60)
-print("Step 4: Summary Report")
-print("="*60)
-
-report = osef.get_summary_report()
-
-print(f"\nSummary:")
-print(f"  Total samples processed: {report['summary']['total_samples_processed']}")
-print(f"  Current state: {report['summary']['current_state']}")
-
-print(f"\nPerformance:")
-print(f"  Average latency: {report['performance']['average_latency_ms']:.2f} ms")
-print(f"  Max latency: {report['performance']['max_latency_ms']:.2f} ms")
-print(f"  Real-time capable: {report['performance']['realtime_capable']}")
-
-print("\n✓ Example completed successfully!\n")
+if __name__ == "__main__":
+    sys.exit(main())
