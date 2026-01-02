@@ -38,15 +38,18 @@ def generate_synthetic_flight(duration=300.0, sampling_rate=8.0, include_disturb
     B = -3.0 + 1.0 * np.cos(time/15) + 0.1 * np.random.randn(n_samples)
     W = np.full_like(time, 0.8)  # Normal power
     
-    # Add disturbance (engine failure)
-    if include_disturbance:
-        disturbance_idx = np.where(time >= disturbance_time)[0][0]
-        # Sudden power loss
-        W[disturbance_idx:] = 0.3 + 0.1 * np.random.randn(n_samples - disturbance_idx)
-        # Increased oscillations in pitch
-        P[disturbance_idx:] += 3.0 * np.sin(time[disturbance_idx:]/5)
-        # Bank angle disturbance
-        B[disturbance_idx:] -= 5.0 * np.exp(-(time[disturbance_idx:] - disturbance_time)/20.0)
+    # Add disturbance (engine failure) - فقط إذا كان disturbance_time ضمن النطاق
+    if include_disturbance and disturbance_time < duration:
+        # Find index where time >= disturbance_time
+        indices = np.where(time >= disturbance_time)[0]
+        if len(indices) > 0:
+            disturbance_idx = indices[0]
+            # Sudden power loss
+            W[disturbance_idx:] = 0.3 + 0.1 * np.random.randn(n_samples - disturbance_idx)
+            # Increased oscillations in pitch
+            P[disturbance_idx:] += 3.0 * np.sin(time[disturbance_idx:]/5)
+            # Bank angle disturbance
+            B[disturbance_idx:] -= 5.0 * np.exp(-(time[disturbance_idx:] - disturbance_time)/20.0)
     
     # Add noise
     P += 0.05 * np.random.randn(n_samples)
