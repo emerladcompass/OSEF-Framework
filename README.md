@@ -135,8 +135,9 @@ Install from PyPI (Recommended)
 pip install osef-framework
 ```
 
-✅ Package published on PyPI: o
-sef-framework v0.1.0
+✅ Package published on PyPI: 
+
+osef-framework v0.1.0
 
 Install from source
 
