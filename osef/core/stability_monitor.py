@@ -558,7 +558,28 @@ class OSEF:
         return self.metrics['ccz_episodes'].copy()
     
     def __repr__(self) -> str:
-        return (f"OSEF(state={self.current_state}, "
-                f"λ={self.current_lambda:.3f}, "
-                f"d_LC={self.current_d_LC:.2f}, "
-                f"samples={self.metrics['total_samples_processed']})")
+        # Safe formatting for values that might be None
+        try:
+            lambda_val = self.current_lambda
+            if lambda_val is None:
+                lambda_str = "N/A"
+            else:
+                lambda_str = f"{lambda_val:.3f}"
+        except AttributeError:
+            lambda_str = "N/A"
+        
+        try:
+            d_LC_val = self.current_d_LC
+            if d_LC_val is None:
+                d_LC_str = "N/A"
+            else:
+                d_LC_str = f"{d_LC_val:.2f}"
+        except AttributeError:
+            d_LC_str = "N/A"
+        
+        try:
+            samples = self.metrics['total_samples_processed']
+        except (AttributeError, KeyError):
+            samples = 0
+        
+        return f"OSEF(state={self.current_state}, λ={lambda_str}, d_LC={d_LC_str}, samples={samples})"
