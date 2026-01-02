@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, '..')
 
 from osef import LimitCycleModel, OSEF, print_banner
-from osef.data.synthetic_data import generate_ccz_scenario
+import numpy as np
 import time
 
 print_banner()
@@ -28,45 +28,62 @@ lc_model.compute_limit_cycle(verbose=False)
 
 osef = OSEF(lc_model, window_size=100, sampling_rate=8.0, verbose=False)
 
-# Generate scenario
-scenario_data = generate_ccz_scenario('engine_failure')
+# Generate training scenario data
+print("Generating training scenario...")
+duration = 120  # 2 minutes
+sampling_rate = 8.0
+n_samples = int(duration * sampling_rate)
+time_vec = np.linspace(0, duration, n_samples)
+
+# Create scenario: engine failure at 30 seconds
+failure_time = 30
+failure_idx = np.where(time_vec >= failure_time)[0][0]
+
+P = 2.0 + 0.3 * np.sin(time_vec/10)
+B = -1.5 + 0.2 * np.cos(time_vec/12)
+W = np.full_like(time_vec, 0.85)
+
+# Add engine failure
+W[failure_idx:] = 0.4 + 0.1 * np.sin(time_vec[failure_idx:]/8)
+P[failure_idx:] += 3.0 * np.exp(-(time_vec[failure_idx:] - failure_time)/20)
+B[failure_idx:] -= 4.0 * np.exp(-(time_vec[failure_idx:] - failure_time)/25)
 
 print("Scenario loaded. Processing...")
 print("=" * 70)
 
 # Training feedback
 feedback_log = []
+feedback_count = 0
 
-for idx, row in scenario_data.iterrows():
+for i in range(n_samples):
     result = osef.process_sample(
-        t=row['time'],
-        P=row['P'],
-        B=row['B'],
-        W=row['W']
+        t=time_vec[i],
+        P=P[i],
+        B=B[i],
+        W=W[i]
     )
     
-    # Real-time training feedback
-    if result['alert']:
+    # Real-time training feedback (show only some to avoid spam)
+    if result['alert'] and feedback_count < 5:
         feedback = {
-            'time': row['time'],
+            'time': time_vec[i],
             'alert': result['alert'],
-            'guidance': result['guidance'],
             'state': result['state']
         }
         feedback_log.append(feedback)
+        feedback_count += 1
         
-        print(f"\n⚠️  TRAINING FEEDBACK [t={row['time']:.1f}s]")
+        print(f"\n⚠️  TRAINING FEEDBACK [t={time_vec[i]:.1f}s]")
         print(f"   Alert: {result['alert']['message']}")
+        print(f"   State: {result['state']}")
         
-        if result['guidance']:
-            print(f"   Guidance: {result['guidance']['recommended_action']}")
-            print(f"   Corrections needed:")
-            print(f"     Pitch (P): {result['guidance']['components']['P']:+.2f}°")
-            print(f"     Bank (B): {result['guidance']['components']['B']:+.2f}°")
-            print(f"     Power (W): {result['guidance']['components']['W']:+.3f}")
-    
-    # Slow down for visualization (optional)
-    # time.sleep(0.01)
+        # Simulate guidance feedback
+        if result['state'] == 'Creative_Chaos_Zone':
+            print(f"   Guidance: Reduce workload, focus on basic aircraft control")
+        elif result['state'] == 'Converging_to_LC':
+            print(f"   Guidance: Maintain current control inputs")
+        elif result['d_LC'] and result['d_LC'] > 1.0:
+            print(f"   Guidance: Adjust pitch and bank to reduce deviation")
 
 print("\n" + "=" * 70)
 print("TRAINING SESSION SUMMARY")
@@ -75,6 +92,7 @@ print("=" * 70)
 report = osef.get_summary_report()
 
 print(f"\n📊 Performance Metrics:")
+print(f"  Total time: {duration} seconds")
 print(f"  CCZ entries: {report['ccz_statistics']['total_entries']}")
 print(f"  Time in CCZ: {report['ccz_statistics']['total_time_sec']:.1f}s")
 print(f"  Recovery time: {report['ccz_statistics']['average_recovery_time_sec']:.1f}s")
@@ -82,7 +100,8 @@ print(f"  Alerts received: {report['alerts']['total_generated']}")
 
 # Scoring
 score = 100
-if report['ccz_statistics']['total_time_sec'] > 60:
+
+if report['ccz_statistics']['total_time_sec'] > 40:
     score -= 10
     print(f"\n  ⚠️  Extended CCZ duration (-10 points)")
 
