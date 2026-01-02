@@ -131,7 +131,7 @@ OSEF-Framework/
 
 ```bash
 # Clone repository
-git clone [https://github.com/emeraldcompass/OSEF-Framework.git](https://github.com/emeraldcompass/OSEF-Framework.git)
+git clone [https://github.com/emerladcompass/OSEF-Framework.git](https://github.com/emeraldcompass/OSEF-Framework.git)
 cd OSEF-Framework
 
 # Install dependencies
