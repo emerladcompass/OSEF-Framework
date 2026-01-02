@@ -172,8 +172,9 @@ echo '```' >> README.md
 ```
 
 
-✅ Available on PyPI: o
-sef-framework v0.1.0
+✅ Available on PyPI: 
+
+osef-framework v0.1.0
 
 💻 Basic Usage
 ```
