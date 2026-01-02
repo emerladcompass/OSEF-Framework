@@ -8,7 +8,6 @@ sys.path.insert(0, '..')
 
 from osef import LimitCycleModel, OSEF, print_banner
 import numpy as np
-import pandas as pd
 
 print_banner()
 
@@ -109,7 +108,7 @@ print("-" * 70)
 results = []
 key_moments = []
 
-for i in range(n_points):
+for i in range(0, n_points, 5):  # Process every 5th sample for speed
     result = osef.process_sample(
         t=time[i],
         P=P[i],
@@ -125,8 +124,8 @@ for i in range(n_points):
         key_moments.append((time[i], result['state'], result['lambda'], result['d_LC']))
     
     # Print state changes
-    if i > 0 and results[i]['state'] != results[i-1]['state']:
-        state_change = f"[t={time[i]:6.1f}s] State transition: {results[i-1]['state']} → {results[i]['state']}"
+    if i > 0 and results[-1]['state'] != results[-2]['state']:
+        state_change = f"[t={time[i]:6.1f}s] State transition: {results[-2]['state']} → {results[-1]['state']}"
         print(state_change)
 
 print("-" * 70)
@@ -145,11 +144,16 @@ print("\n🎯 Key Findings:")
 
 # Find max lambda
 lambda_vals = [r['lambda'] for r in results if r['lambda'] is not None]
-max_lambda = max(lambda_vals) if lambda_vals else 0
-max_lambda_time = time[lambda_vals.index(max_lambda)] if lambda_vals else 0
+if lambda_vals:
+    max_lambda = max(lambda_vals)
+    max_lambda_idx = lambda_vals.index(max_lambda)
+    max_lambda_time = time[max_lambda_idx * 5]  # Account for sampling every 5th point
+else:
+    max_lambda = 0
+    max_lambda_time = 0
 
 print(f"  Peak instability (λ): {max_lambda:.2f} at t={max_lambda_time:.1f}s")
-print(f"  Initial chaos classification: {results[100]['state'] if len(results) > 100 else 'N/A'}")
+print(f"  Initial chaos classification: {results[20]['state'] if len(results) > 20 else 'N/A'}")
 
 # CCZ analysis
 print(f"\n📊 Creative Chaos Zone Analysis:")
@@ -174,12 +178,12 @@ else:
 print(f"\n💡 OSEF Insights:")
 print(f"  • Peak chaos (λ={max_lambda:.2f}) occurred at T+{max_lambda_time:.0f}s")
 print(f"  • Crew navigated through CCZ, demonstrating adaptive capacity")
-print(f"  • Convergence to stable LC achieved despite 650+ system warnings")
+print(f"  • Convergence to stable LC achieved despite simulated system failures")
 print(f"  • Emergency parameters (μ={lc_model.mu:.2f}, ω₀={lc_model.omega_0:.2f}) appropriate for extreme scenarios")
 
 print(f"\n🏆 Lessons from QF32:")
 print(f"  1. Limit cycles can form even in extreme chaos (λ_peak = {max_lambda:.2f})")
-print(f"  2. Strong crew coupling (5 pilots) enabled rapid LC formation")
+print(f"  2. Strong crew coupling enabled rapid LC formation")
 print(f"  3. Creative Chaos Zone is where innovation occurs (non-standard procedures)")
 print(f"  4. Training for LC formation (not just procedures) is essential")
 
