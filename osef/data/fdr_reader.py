@@ -9,7 +9,7 @@ try:
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
-    pd = None  # لاستخدامه لاحقاً
+    pd = None
     print("Note: pandas not available, using numpy alternative")
 from typing import Dict, Optional, List, Tuple, Any
 import warnings
@@ -48,7 +48,7 @@ class FDRReader:
                  time_col: str = 'time',
                  pitch_col: Optional[str] = None,
                  bank_col: Optional[str] = None,
-                 power_col: Optional[str] = None) -> Optional[Any]:
+                 power_col: Optional[str] = None):
         """
         Read FDR data from CSV file.
         
@@ -105,7 +105,7 @@ class FDRReader:
         
         return result
     
-    def read_hdf5(self, filepath: str) -> Optional[Any]:
+    def read_hdf5(self, filepath: str):
         """
         Read FDR data from HDF5 file.
         
@@ -169,7 +169,7 @@ class FDRReader:
         
         raise ValueError(f"Could not find column matching any of: {candidates}")
     
-    def _resample_data(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _resample_data(self, df):
         """
         Resample data to target sampling rate.
         
@@ -206,7 +206,7 @@ class FDRReader:
         return result
     
     def extract_pbw(self, 
-                    df: Optional[Any],
+                    df: Optional[Any] = None,
                     normalize_power: bool = True) -> Dict[str, np.ndarray]:
         """
         Extract P, B, W as numpy arrays.
@@ -265,7 +265,7 @@ class FDRReader:
         return result
 
 
-def load_sample_fdr() -> Optional[Any]:
+def load_sample_fdr():
     """
     Load sample FDR data for testing.
     
