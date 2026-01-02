@@ -34,12 +34,12 @@ setup(
     description='Operational Stability Envelope Framework for Aviation Safety',
     long_description=read_readme(),
     long_description_content_type='text/markdown',
-    url='https://github.com/emeraldcompass/OSEF-Framework',
+    url='https://github.com/emerladcompass/OSEF-Framework',
     project_urls={
-        'Documentation': 'https://emeraldcompass.github.io/Aviation/',
-        'Source': 'https://github.com/emeraldcompass/OSEF-Framework',
+        'Documentation': 'https://emerladcompass.github.io/Aviation/',
+        'Source': 'https://github.com/emerladcompass/OSEF-Framework',
         'Research Paper': 'https://doi.org/10.17605/OSF.IO/RJBDK',
-        'Bug Reports': 'https://github.com/emeraldcompass/OSEF-Framework/issues',
+        'Bug Reports': 'https://github.com/emerladcompass/OSEF-Framework/issues',
     },
     packages=find_packages(exclude=['tests', 'docs', 'examples']),
     classifiers=[
