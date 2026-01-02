@@ -141,6 +141,13 @@ pip install -r requirements.txt
 conda env create -f environment.yml
 conda activate osef
 ```
+PyPI Package
+
+```bash
+pip install osef-framework
+```
+
+✅ Available on PyPI: osef-framework v0.1.0
 
 💻 Basic Usage
 ```
@@ -235,3 +242,11 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 ---
 
 🧭 *"Where disciplines converge • Where patterns emerge • Where safety evolves"* 🧭
+
+## 🚀 Installation
+
+```bash
+pip install osef-framework
+```
+
+✅ **Package published on [PyPI](https://pypi.org/project/osef-framework/)**
