@@ -1,31 +1,50 @@
-# 📚 OSEF-Framework Documentation Index
+```
+# 📚 OSEF-Framework Documentation
 
-## 🔬 Research Logs
-- [Initial Project Setup](../RESEARCH_LOG.md) — January 2, 2026
-  - Project creation from scratch
-  - CI/CD pipeline establishment
-  - GitHub repository setup
+## 🔬 Research & Development
+- [Research Log](https://github.com/emerladcompass/OSEF-Framework/blob/main/RESEARCH_LOG.md) — January 2, 2026
+- [Engineering Log](https://github.com/emerladcompass/OSEF-Framework/blob/main/ENGINEERING_LOG_2026_01_02_SESSION_2.md) — January 2, 2026
 
-## ⚙️ Engineering Logs
-- [Session 2: Example Stabilization](../ENGINEERING_LOG_2026_01_02_SESSION_2.md) — January 2, 2026
-  - Dependency removal (pandas-free examples)
-  - Performance validation
-  - CI/CD confirmation
+## 🧪 Code Examples
+- [Example 1: Basic Usage](https://github.com/emerladcompass/OSEF-Framework/blob/main/examples/01_basic_usage.py)
+- [Example 2: Flight Simulation](https://github.com/emerladcompass/OSEF-Framework/blob/main/examples/02_flight_simulation.py)
+- [Example 3: QF32 Reconstruction](https://github.com/emerladcompass/OSEF-Framework/blob/main/examples/03_qf32_reconstruction.py)
+- [Example 4: Training Mode](https://github.com/emerladcompass/OSEF-Framework/blob/main/examples/04_training_mode.py)
+- [Example 5: Fleet Monitoring](https://github.com/emerladcompass/OSEF-Framework/blob/main/examples/05_fleet_monitoring.py)
 
-## 🧪 Examples
-- [Example 1: Basic Usage](../examples/01_basic_usage.py)
-- [Example 2: Flight Simulation](../examples/02_flight_simulation.py)
-- [Example 3: QF32 Reconstruction](../examples/03_qf32_reconstruction.py)
-- [Example 4: Training Mode](../examples/04_training_mode.py)
-- [Example 5: Fleet Monitoring](../examples/05_fleet_monitoring.py)
+## ⚙️ Technical Infrastructure
+- [CI/CD Pipeline](https://github.com/emerladcompass/OSEF-Framework/blob/main/.github/workflows/ci.yml)
 
-## 🔧 Technical Infrastructure
-- [CI/CD Pipeline](../.github/workflows/ci.yml)
-- Project Structure
-- Dependencies Configuration
+## 🚀 Quick Start
+```bash
+pip install osef-framework
+```
 
-## 🚀 Next Steps
+```python
+import osef_framework
+from osef_framework import StabilityMonitor
+
+monitor = StabilityMonitor()
+result = monitor.analyze(pitch=2.5, bank=1.2, power=85.0)
+```
+
+📈 Development Roadmap
+
 1. Core OSEF algorithm development
 2. Enhanced testing suite
 3. Performance optimization
 4. Real-world data integration
+
+🔗 Links
+
+https://github.com/emerladcompass/OSEF-Framework
+https://pypi.org/project/osef-framework/
+https://emerladcompass.github.io/OSEF-Framework/
+
+📊 Status
+
+Version: 0.1.2
+CI: https://github.com/emerladcompass/OSEF-Framework/workflows/CI/badge.svg
+Python: 3.8+
+
+```
