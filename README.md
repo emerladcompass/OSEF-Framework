@@ -213,7 +213,8 @@ Validated on the same dataset as [Baladi et al., 2025]:
 [![Downloads](https://static.pepy.tech/badge/osef-framework)](https://pepy.tech/projects/osef-framework)
 
 ### Documentation:
-- 🌐 **Website**: [https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
+- 🌐 **Website**:
+[https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
 - 🐙 **GitHub**: [https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)
 - 📦 **PyPI**: [https://pypi.org/project/osef-framework/](https://pypi.org/project/osef-framework/)
 - 🔬 **Research**: [https://doi.org/10.17605/OSF.IO/RJBDK](https://doi.org/10.17605/OSF.IO/RJBDK)
