@@ -197,7 +197,27 @@ Validated on the same dataset as [Baladi et al., 2025]:
 | | **Creative Chaos Zones** | Transitional stability regions where $0.01 < \lambda < 0.5$. |
 | | **Real-Time Supervision** | OSEF continuously monitors trajectory and provides guidance. |
 
-🎓 Citation
+---
+
+## 🌟 Community Recognition
+
+### Submitted to Awesome Lists:
+[![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
+
+1. **[Awesome Python](https://github.com/vinta/awesome-python/pull/2830)** - PR #2830
+2. **[Awesome Robotics](https://github.com/kiloreux/awesome-robotics/pull/82)** - PR #82  
+3. **[Awesome Scientific Computing](https://github.com/nschloe/awesome-scientific-computing/pull/100)**- PR #100
+
+### PyPI Package:
+[![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
+[![Downloads](https://static.pepy.tech/badge/osef-framework)](https://pepy.tech/projects/osef-framework)
+
+### Documentation:
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://emerladcompass.github.io/OSEF-Framework/)
+
+---
+
+### 🎓 Citation
 OSEF Framework:
 ```
 @software{baladi2026osef,
