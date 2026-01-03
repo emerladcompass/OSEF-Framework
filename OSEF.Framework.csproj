@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>OSEF</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Samir Baladi</Authors>
+    <Description>Operational Stability Envelope Framework</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/emerladcompass/OSEF-Framework</RepositoryUrl>
+  </PropertyGroup>
+</Project>
