@@ -34,9 +34,9 @@ result = monitor.analyze(pitch=2.5, bank=1.2, power=85.0)
 4. Real-world data integration
 
 ## 🔗 Links
-- https://github.com/emerladcompass/OSEF-Framework
-- https://pypi.org/project/osef-framework/
-- https://emerladcompass.github.io/OSEF-Framework/
+- [GitHub Repository](https://github.com/emerladcompass/OSEF-Framework/blob/main/)
+- [PyPI Package](https://pypi.org/project/osef-framework/)
+- [Documentation](https://emerladcompass.github.io/OSEF-Framework/)
 
 ## 📊 Status
 **Version**: 0.1.2  
