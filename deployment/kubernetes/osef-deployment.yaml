@@ -1,0 +1,1011 @@
+```yaml
+# osef-deployment.yaml
+# Open-Source Flight Safety (OSEF) - CCZ Monitoring System Deployment
+# Kubernetes Deployment Configuration for Production
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: osef-ccz
+  labels:
+    name: osef-ccz
+    environment: production
+    component: flight-safety
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ccz-monitoring-sa
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: service-account
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ccz-monitoring-cr
+  labels:
+    app: ccz-monitoring
+    component: cluster-role
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ccz-monitoring-crb
+  labels:
+    app: ccz-monitoring
+    component: cluster-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: ccz-monitoring-sa
+    namespace: osef-ccz
+roleRef:
+  kind: ClusterRole
+  name: ccz-monitoring-cr
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ccz-config
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: config
+data:
+  CCZ_ENV: "production"
+  CCZ_LOG_LEVEL: "INFO"
+  CCZ_MODEL_PATH: "/app/models"
+  CCZ_DATA_PATH: "/app/data"
+  CCZ_RESULTS_PATH: "/app/results"
+  CCZ_UPDATE_INTERVAL: "0.1"
+  CCZ_DETECTION_THRESHOLD: "0.5"
+  CCZ_WARNING_THRESHOLD: "0.3"
+  CCZ_ALERT_THRESHOLD: "0.7"
+  CCZ_MAX_LYAPUNOV: "2.0"
+  CCZ_SAMPLING_RATE: "125"
+  CCZ_WINDOW_SIZE: "1024"
+  CCZ_OVERLAP: "0.5"
+  PROMETHEUS_METRICS_PORT: "9090"
+  WEB_SERVER_PORT: "8080"
+  GRPC_SERVER_PORT: "50051"
+  ARINC429_SIMULATION: "true"
+  ARINC429_BUS_SPEED: "100000"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ccz-feature-flags
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: feature-flags
+data:
+  ENABLE_REAL_TIME_MONITORING: "true"
+  ENABLE_HISTORICAL_ANALYSIS: "true"
+  ENABLE_PREDICTIVE_ALERTS: "true"
+  ENABLE_ARINC429_INTEGRATION: "true"
+  ENABLE_EXTERNAL_API: "true"
+  ENABLE_METRICS_EXPORT: "true"
+  ENABLE_HEALTH_CHECKS: "true"
+  ENABLE_AUTO_SCALING: "true"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ccz-secrets
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: secrets
+type: Opaque
+data:
+  # Base64 encoded secrets (echo -n 'value' | base64)
+  POSTGRES_PASSWORD: cG9zdGdyZXMtcGFzc3dvcmQ=  # postgres-password
+  REDIS_PASSWORD: cmVkaXMtcGFzc3dvcmQ=         # redis-password
+  JWT_SECRET_KEY: anNlY3JldC1rZXk=             # jsecret-key
+  ENCRYPTION_KEY: ZW5jcnlwdGlvbi1rZXk=         # encryption-key
+  API_KEY: YXBpLWtleQ==                        # api-key
+  GRAFANA_ADMIN_PASSWORD: Z3JhZmFuYS1wYXNzd29yZA==  # grafana-password
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ccz-data-pvc
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: storage
+    storage-class: ssd
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ssd
+  resources:
+    requests:
+      storage: 100Gi
+  selector:
+    matchLabels:
+      type: local-ssd
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ccz-models-pvc
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: models
+    storage-class: ssd
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ssd
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ccz-monitoring
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: main
+    version: v1.0.0
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: ccz-monitoring
+      component: main
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  minReadySeconds: 30
+  progressDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: ccz-monitoring
+        component: main
+        version: v1.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+        sidecar.istio.io/inject: "true"
+    spec:
+      serviceAccountName: ccz-monitoring-sa
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+      terminationGracePeriodSeconds: 60
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      containers:
+      - name: ccz-monitoring
+        image: ccz-monitoring:1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        - name: grpc
+          containerPort: 50051
+          protocol: TCP
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: CCZ_DATABASE_URL
+          value: "postgresql://postgres:$(POSTGRES_PASSWORD)@ccz-postgres.osef-ccz.svc.cluster.local/ccz_db"
+        - name: CCZ_REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@ccz-redis.osef-ccz.svc.cluster.local:6379/0"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ccz-secrets
+              key: POSTGRES_PASSWORD
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ccz-secrets
+              key: REDIS_PASSWORD
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ccz-secrets
+              key: JWT_SECRET_KEY
+        envFrom:
+        - configMapRef:
+            name: ccz-config
+        - configMapRef:
+            name: ccz-feature-flags
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "10Gi"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            ephemeral-storage: "20Gi"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/data
+          subPath: data
+        - name: models-volume
+          mountPath: /app/models
+          subPath: models
+        - name: logs-volume
+          mountPath: /app/logs
+          subPath: logs
+        - name: results-volume
+          mountPath: /app/results
+          subPath: results
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30
+          successThreshold: 1
+        securityContext:
+          privileged: false
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+            add:
+              - NET_BIND_SERVICE
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 30 && pkill -TERM python"]
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: ccz-data-pvc
+      - name: models-volume
+        persistentVolumeClaim:
+          claimName: ccz-models-pvc
+      - name: logs-volume
+        emptyDir: {}
+      - name: results-volume
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: ccz-config
+          optional: false
+      imagePullSecrets:
+      - name: regcred
+      nodeSelector:
+        node-type: compute-optimized
+      tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "ccz-monitoring"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - ccz-monitoring
+              topologyKey: kubernetes.io/hostname
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ccz-monitoring-hpa
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ccz-monitoring
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: custom_metric_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: 100
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      - type: Pods
+        value: 4
+        periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 20
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Min
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ccz-monitoring
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.0.100.50
+  externalTrafficPolicy: Local
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 8080
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+    appProtocol: http
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+    protocol: TCP
+    appProtocol: grpc
+  selector:
+    app: ccz-monitoring
+    component: main
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ccz-monitoring-ingress
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+spec:
+  tls:
+  - hosts:
+    - ccz-monitoring.osef.local
+    - api.ccz.osef.local
+    - monitoring.ccz.osef.local
+    secretName: ccz-tls-secret
+  rules:
+  - host: ccz-monitoring.osef.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ccz-monitoring
+            port:
+              name: http
+  - host: api.ccz.osef.local
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: ccz-monitoring
+            port:
+              name: http
+      - path: /docs
+        pathType: Prefix
+        backend:
+          service:
+            name: ccz-monitoring
+            port:
+              name: http
+  - host: monitoring.ccz.osef.local
+    http:
+      paths:
+      - path: /metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: ccz-monitoring
+            port:
+              name: metrics
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ccz-postgres
+  namespace: osef-ccz
+  labels:
+    app: ccz-postgres
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: ccz-postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ccz-postgres
+  namespace: osef-ccz
+  labels:
+    app: ccz-postgres
+    component: database
+spec:
+  serviceName: ccz-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ccz-postgres
+  template:
+    metadata:
+      labels:
+        app: ccz-postgres
+        component: database
+    spec:
+      serviceAccountName: ccz-monitoring-sa
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          value: "ccz_db"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ccz-secrets
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - exec pg_isready -U postgres
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - exec pg_isready -U postgres
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          privileged: false
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: ccz-postgres-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ccz-postgres-pvc
+  namespace: osef-ccz
+  labels:
+    app: ccz-postgres
+    component: storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ssd
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ccz-redis
+  namespace: osef-ccz
+  labels:
+    app: ccz-redis
+    component: cache
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+  selector:
+    app: ccz-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ccz-redis
+  namespace: osef-ccz
+  labels:
+    app: ccz-redis
+    component: cache
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ccz-redis
+  template:
+    metadata:
+      labels:
+        app: ccz-redis
+        component: cache
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        imagePullPolicy: IfNotPresent
+        command: ["redis-server", "--appendonly", "yes", "--requirepass", "$(REDIS_PASSWORD)"]
+        ports:
+        - containerPort: 6379
+          protocol: TCP
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ccz-secrets
+              key: REDIS_PASSWORD
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: redis-data
+        emptyDir: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ccz-backup
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: backup
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app: ccz-monitoring
+            component: backup
+        spec:
+          serviceAccountName: ccz-monitoring-sa
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: ccz-monitoring:1.0.0
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                echo "Starting backup process..."
+                timestamp=$(date +%Y%m%d_%H%M%S)
+                # Backup PostgreSQL
+                pg_dump -h ccz-postgres -U postgres ccz_db > /backup/postgres_${timestamp}.sql
+                # Backup Redis
+                redis-cli -h ccz-redis -a $REDIS_PASSWORD --rdb /backup/redis_${timestamp}.rdb
+                # Backup models and data
+                tar czf /backup/data_${timestamp}.tar.gz -C /app/data .
+                tar czf /backup/models_${timestamp}.tar.gz -C /app/models .
+                # Upload to S3 (if configured)
+                if [ -n "$S3_BUCKET" ]; then
+                  aws s3 cp /backup/ s3://${S3_BUCKET}/backups/${timestamp}/ --recursive
+                fi
+                echo "Backup completed: ${timestamp}"
+            env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ccz-secrets
+                  key: POSTGRES_PASSWORD
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ccz-secrets
+                  key: REDIS_PASSWORD
+            - name: S3_BUCKET
+              value: "osef-ccz-backups"
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+            - name: data-volume
+              mountPath: /app/data
+              readOnly: true
+            - name: models-volume
+              mountPath: /app/models
+              readOnly: true
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: ccz-backup-pvc
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: ccz-data-pvc
+          - name: models-volume
+            persistentVolumeClaim:
+              claimName: ccz-models-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ccz-backup-pvc
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: backup-storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 200Gi
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ccz-monitoring-monitor
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: ccz-monitoring
+  namespaceSelector:
+    matchNames:
+    - osef-ccz
+  endpoints:
+  - port: metrics
+    interval: 30s
+    scrapeTimeout: 10s
+    path: /metrics
+    honorLabels: true
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod
+    - sourceLabels: [__meta_kubernetes_namespace]
+      targetLabel: namespace
+    - sourceLabels: [__meta_kubernetes_service_name]
+      targetLabel: service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ccz-monitoring-node-exporter
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: node-exporter
+spec:
+  clusterIP: None
+  ports:
+  - name: metrics
+    port: 9100
+    targetPort: 9100
+  selector:
+    app: ccz-monitoring
+    component: main
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: ccz-monitoring-pdb
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: pdb
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: ccz-monitoring
+      component: main
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ccz-prometheus-alerts
+  namespace: osef-ccz
+  labels:
+    app: ccz-monitoring
+    component: alerts
+data:
+  alerts.rules: |
+    groups:
+    - name: ccz-monitoring-alerts
+      rules:
+      - alert: CCZMonitoringHighCPU
+        expr: rate(process_cpu_seconds_total{app="ccz-monitoring"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: monitoring
+        annotations:
+          summary: "High CPU usage on CCZ Monitoring"
+          description: "CPU usage is above 80% for 5 minutes on {{ $labels.pod }}"
+      
+      - alert: CCZMonitoringHighMemory
+        expr: container_memory_working_set_bytes{container="ccz-monitoring"} > 3.5e9
+        for: 5m
+        labels:
+          severity: warning
+          component: monitoring
+        annotations:
+          summary: "High memory usage on CCZ Monitoring"
+          description: "Memory usage is above 3.5GB on {{ $labels.pod }}"
+      
+      - alert: CCZMonitoringDown
+        expr: up{app="ccz-monitoring"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: monitoring
+        annotations:
+          summary: "CCZ Monitoring pod is down"
+          description: "Pod {{ $labels.pod }} has been down for more than 1 minute"
+      
+      - alert: CCZHighDetectionRate
+        expr: rate(ccz_detections_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          component: detection
+        annotations:
+          summary: "High CCZ detection rate"
+          description: "CCZ detection rate is above 10 per second"
+      
+      - alert: CCZDatabaseHighLatency
+        expr: histogram_quantile(0.95, rate(ccz_db_query_duration_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database latency"
+          description: "95th percentile of database queries is above 500ms"
+```
+
+This comprehensive Kubernetes deployment manifest includes:
+
+Key Components:
+
+1. Namespace Isolation: Dedicated osef-ccz namespace
+2. RBAC Security: Service account with appropriate permissions
+3. Config Management: ConfigMaps for configuration and feature flags
+4. Secrets Management: Secure handling of sensitive data
+5. Storage: Persistent volumes for data, models, backups
+6. Main Deployment: 3-replica deployment with:
+   · Resource limits and requests
+   · Liveness/readiness/startup probes
+   · Security context (non-root, read-only filesystem)
+   · Anti-affinity for high availability
+7. Auto-scaling: Horizontal Pod Autoscaler with custom metrics
+8. Networking: Services, LoadBalancer, Ingress with TLS
+9. Database: PostgreSQL StatefulSet with persistence
+10. Cache: Redis deployment for caching
+11. Backups: CronJob for automated daily backups
+12. Monitoring: ServiceMonitor for Prometheus integration
+13. High Availability: PodDisruptionBudget for availability guarantees
+14. Alerting: Prometheus alert rules
+
+Deployment Commands:
+
+```bash
+# Apply all configurations
+kubectl apply -f osef-deployment.yaml
+
+# Check deployment status
+kubectl get all -n osef-ccz
+kubectl get pods -n osef-ccz -w
+kubectl get svc -n osef-ccz
+kubectl get ingress -n osef-ccz
+
+# View logs
+kubectl logs -n osef-ccz deployment/ccz-monitoring -f
+kubectl logs -n osef-ccz deployment/ccz-postgres -f
+
+# Check resource usage
+kubectl top pods -n osef-ccz
+kubectl describe hpa -n osef-ccz ccz-monitoring-hpa
+
+# Port forwarding for local access
+kubectl port-forward -n osef-ccz svc/ccz-monitoring 8080:80
+
+# Backup manual trigger
+kubectl create job --from=cronjob/ccz-backup ccz-backup-manual -n osef-ccz
+
+# Scale deployment
+kubectl scale deployment ccz-monitoring --replicas=5 -n osef-ccz
+
+# Update deployment
+kubectl set image deployment/ccz-monitoring ccz-monitoring=ccz-monitoring:1.0.1 -n osef-ccz
+```
+
+Prerequisites:
+
+1. Kubernetes Cluster: v1.24+ with:
+   · StorageClass ssd and standard
+   · LoadBalancer support
+   · Ingress controller (nginx)
+   · Prometheus operator (optional)
+2. Container Registry: Image ccz-monitoring:1.0.0 available
+3. Network Policies: Adjust based on your cluster setup
+4. Storage: Ensure sufficient PV provisioning
+
+This deployment is production-ready with enterprise-grade features for reliability, scalability, and observability.
