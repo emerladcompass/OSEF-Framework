@@ -213,8 +213,7 @@ Validated on the same dataset as [Baladi et al., 2025]:
 [![Downloads](https://static.pepy.tech/badge/osef-framework)](https://pepy.tech/projects/osef-framework)
 
 ### Documentation:
-- 🌐 **Website**:
-[https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
+- 🌐 **Website**: [https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
 - 🐙 **GitHub**: [https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)
 - 📦 **PyPI**: [https://pypi.org/project/osef-framework/](https://pypi.org/project/osef-framework/)
 - 🔬 **Research**: [https://doi.org/10.17605/OSF.IO/RJBDK](https://doi.org/10.17605/OSF.IO/RJBDK)
@@ -270,9 +269,3 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 
 🧭 *"Where disciplines converge • Where patterns emerge • Where safety evolves"* 🧭
 
-## 📊 Project Badges
-
-[![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/osef-framework.svg)](https://pypi.org/project/osef-framework/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI Status](https://github.com/emerladcompass/OSEF-Framework/workflows/CI/badge.svg)](https://github.com/emerladcompass/OSEF-Framework/actions)
