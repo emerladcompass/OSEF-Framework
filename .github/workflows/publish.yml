@@ -23,13 +23,14 @@ jobs:
     - name: Install build tools
       run: |
         python -m pip install --upgrade pip
-        pip install build twine
+        pip install setuptools wheel twine
         
-    - name: Build package
-      run: python -m build
-      
-    - name: List built files
-      run: ls -la dist/
+    - name: Build package using setup.py
+      run: |
+        echo "Building using setup.py..."
+        python setup.py sdist bdist_wheel
+        echo "Built packages:"
+        ls -la dist/
       
     - name: Publish to GitHub Packages
       env:
