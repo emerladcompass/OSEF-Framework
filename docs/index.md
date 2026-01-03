@@ -1,4 +1,3 @@
-```markdown
 # 📚 OSEF-Framework Documentation
 
 ## 🔬 Research & Development
@@ -16,35 +15,30 @@
 - [CI/CD Pipeline](https://github.com/emerladcompass/OSEF-Framework/blob/main/.github/workflows/ci.yml)
 
 ## 🚀 Quick Start
-```bash
+\`\`\`bash
 pip install osef-framework
-```
+\`\`\`
 
-```python
+\`\`\`python
 import osef_framework
 from osef_framework import StabilityMonitor
 
 monitor = StabilityMonitor()
 result = monitor.analyze(pitch=2.5, bank=1.2, power=85.0)
-```
 
-📈 Development Roadmap
 
+## 📈 Development Roadmap
 1. Core OSEF algorithm development
 2. Enhanced testing suite
 3. Performance optimization
 4. Real-world data integration
 
-🔗 Links
+## 🔗 Links
+- https://github.com/emerladcompass/OSEF-Framework
+- https://pypi.org/project/osef-framework/
+- https://emerladcompass.github.io/OSEF-Framework/
 
-https://github.com/emerladcompass/OSEF-Framework
-https://pypi.org/project/osef-framework/
-https://emerladcompass.github.io/OSEF-Framework/
-
-📊 Status
-
-Version: 0.1.2
-CI: https://github.com/emerladcompass/OSEF-Framework/workflows/CI/badge.svg
-Python: 3.8+
-
-```
+## 📊 Status
+**Version**: 0.1.2  
+**CI**: ![CI Status](https://github.com/emerladcompass/OSEF-Framework/workflows/CI/badge.svg)  
+**Python**: 3.8+
