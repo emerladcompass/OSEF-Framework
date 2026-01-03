@@ -173,6 +173,8 @@ Result: From concept to public release in 72 hours
 
 🔬 Research Paper:
    https://doi.org/10.17605/OSF.IO/RJBDK
+   
+   🏠 Landing Page: https://osef-framework.netlify.app/
 ```
 
 ### **Documentation Files**
