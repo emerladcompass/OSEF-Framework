@@ -1,4 +1,4 @@
-## 🧭 OSEF: Operational Stability Envelope Framework
+🧭 OSEF: Operational Stability Envelope Framework
 
 [![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -146,7 +146,7 @@ OSEF-Framework/
 
 ```
 ---
-```markdown
+
 # 🧭 OSEF: Operational Stability Envelope Framework
 
 [![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
@@ -256,6 +256,76 @@ Validated on 1,247 commercial flights:
 | **Training Mode** | Interactive simulator with feedback | `python examples/04_training_mode.py` |
 
 ---
+# OSEF-Simulation
+
+**OSEF-Simulation** is a Python framework for real-time aviation safety monitoring. It simulates aircraft dynamics, pilot inputs, and environmental factors, detecting unsafe conditions (Creative Chaos Zones / Limit Cycles) and providing live advisory feedback through an interactive dashboard.
+
+---
+
+## 📂 Project Structure
+```
+OSEF-Simulation/
+│
+├── README.md
+├── requirements.txt
+│
+├── simulation/              # All simulation-related modules
+│   ├── __init__.py          # Makes this folder a Python package
+│   ├── aircraft_model.py    # Aircraft state and dynamics
+│   ├── pilot_input.py       # Pilot inputs (Keyboard / Joystick)
+│   ├── environment.py       # Wind disturbances / gusts
+│   └── limit_cycle.py       # CCZ and Limit Cycle detection
+│
+├── visualization/           # Visualization and dashboard
+│   ├── __init__.py          # Makes this folder a Python package
+│   ├── dashboard.py         # Digital CCZ advisory panel
+│   └── animator.py          # Animated Pitch / Roll / Velocity plots
+│
+└── main.py                  # Main script to run the simulation
+```
+---
+
+## Features
+
+- Simulate aircraft state (velocity, pitch, roll, yaw, rotational rates).  
+- Handle pilot inputs via keyboard or joystick.  
+- Model environmental effects like wind and turbulence.  
+- Detect and alert Creative Chaos Zones (CCZ) and limit cycles.  
+- Real-time visualization with animated pitch, roll, and velocity.  
+- Interactive cockpit-style advisory dashboard.  
+
+## Future Enhancements
+
+- Real aircraft data integration (X-Plane / FlightGear).  
+- Advanced turbulence and gust models.  
+- Multi-axis joystick support and realistic pilot behavior.  
+- Enhanced alert visualization with stability margins and envelopes.
+
+---
+## 🚀 Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/yourusername/OSEF-Simulation.git
+cd OSEF-Simulation
+```
+---
+2. Install dependencies
+Bash
+pip install -r requirements.txt
+3. Run the simulation
+Bash
+python main.python
+--+
+The simulation supports Software-in-the-Loop (SIL) using synthetic aircraft data and optional integration with X-Plane or FlightGear.
+## 🔮 Future Enhancements
+Full X-Plane / FlightGear integration with live aircraft data.
+Advanced turbulence and gust models (Dryden / von Kármán spectra).
+Multi-axis joystick support and realistic pilot input simulation.
+Enhanced CCZ & Limit Cycle visualization with dynamic envelopes.
+Logging and replay of simulation sessions.
+-----------
+
 
 ## 📚 Documentation
 
