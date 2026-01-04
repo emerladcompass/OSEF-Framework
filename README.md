@@ -1,4 +1,4 @@
-# 🧭 # 🧭 OSEF: Operational Stability Envelope Framework
+# 🧭 OSEF: Operational Stability Envelope Framework
 
 [![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
