@@ -1,4 +1,4 @@
-# 🧭 OSEF: Operational Stability Envelope Framework
+🧭 OSEF: Operational Stability Envelope Framework
 
 [![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -16,8 +16,15 @@ OSEF translates validated limit cycle dynamics theory into operational real-time
 
 ## Regulatory Positioning
 
-This project is currently positioned as a research and advisory framework.
-See [REGULATORY_POSITIONING_DO178C.md](./REGULATORY_POSITIONING_DO178C.md) for details.
+OSEF is currently positioned as a **research and advisory framework** intended for
+simulation, training, and analytical environments.
+
+It does **not** exert control authority over any aircraft system and is **not**
+classified as flight-critical avionics software.
+
+For a detailed discussion of its regulatory scope and its alignment with
+DO-178C awareness objectives, see  
+[REGULATORY_POSITIONING_DO178C.md](./REGULATORY_POSITIONING_DO178C.md).
 
 ---
 
