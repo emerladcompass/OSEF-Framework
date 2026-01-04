@@ -284,30 +284,43 @@ OSEF-Simulation/
 └── main.py                  # Main script to run the simulation
 ```
 ---
+---
 
-## Features
+## ⚙️ Features
 
-- Simulate aircraft state (velocity, pitch, roll, yaw, rotational rates).  
+- Simulate aircraft state variables: velocity, pitch, roll, yaw, and rotational rates.  
 - Handle pilot inputs via keyboard or joystick.  
-- Model environmental effects like wind and turbulence.  
-- Detect and alert Creative Chaos Zones (CCZ) and limit cycles.  
-- Real-time visualization with animated pitch, roll, and velocity.  
+- Model environmental effects: wind, turbulence, and gusts.  
+- Detect and alert Creative Chaos Zones (CCZ) and Limit Cycles.  
+- Real-time visualization of pitch, roll, and velocity.  
 - Interactive cockpit-style advisory dashboard.  
-
-## 🔮 Future Enhancements
-
-- Real aircraft data integration (X-Plane / FlightGear).  
-- Advanced turbulence and gust models.  
-- Multi-axis joystick support and realistic pilot behavior.  
-- Enhanced alert visualization with stability margins and envelopes.
+- Modular structure for easy extensions and integration.  
 
 ---
+
+## 🖥️ Example Screenshots
+
+**All images are stored in the `pictures/` folder.**
+
+### 1. Pitch & Roll Animation
+![Pitch & Roll Animation](pictures/pitch_roll_example.png)  
+
+### 2. Velocity & CCZ Alerts
+![Velocity & CCZ Alerts](pictures/velocity_ccz_example.png)  
+
+### 3. Advisory Dashboard
+![OSEF Advisory Panel](pictures/dashboard_example.png)  
+
+> Note: Images above are placeholders. Replace with actual screenshots after running the simulation.
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/OSEF-Simulation.git
-cd OSEF-Simulation
+git clone https://github.com/emerladcompass/OSEF-Framework.git
+cd OSEF-Framework/OSEF-Simulation
 ```
 ---
 2. Install dependencies
