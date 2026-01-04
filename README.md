@@ -14,6 +14,14 @@ OSEF translates validated limit cycle dynamics theory into operational real-time
 
 ---
 
+## Regulatory Positioning
+
+This project is currently positioned as a research and advisory framework.
+See [REGULATORY_POSITIONING_DO178C.md](./REGULATORY_POSITIONING_DO178C.md) for details.
+
+---
+
+
 ## 🎯 **What is OSEF?**
 
 OSEF is a **computational framework** that:
