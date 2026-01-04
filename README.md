@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![DOI](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FRJBDK-blue)](https://doi.org/10.17605/OSF.IO/RJBDK)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18143237.svg)](https://doi.org/10.5281/zenodo.18143237)
 [![Preregistration](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FED89G-blue)](https://doi.org/10.17605/OSF.IO/ED89G)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-green)]()
 
@@ -269,20 +270,21 @@ Validated on 1,247 commercial flights:
 ## 🎓 Citation
 
 ### OSEF Framework:
-```bibtex
-@software{baladi2026osef,
+```BibTeX:
+% Software (Zenodo)
+@software{baladi2026osef_software,
   author = {Baladi, Samir},
-  title = {{OSEF: Operational Stability Envelope Framework}},
+  title = {{OSEF Framework: Operational Stability Envelope Framework 
+           for Real-Time Aviation Safety Monitoring}},
   year = {2026},
+  publisher = {Zenodo},
   version = {0.1.2},
-  doi = {10.17605/OSF.IO/ED89G},
-  url = {https://github.com/emerladcompass/OSEF-Framework}
+  doi = {10.5281/zenodo.18143237},
+  url = {https://doi.org/10.5281/zenodo.18143237}
 }
-```
 
-### Foundational Research:
-```bibtex
-@article{baladi2026limitcycle,
+% Research Paper (OSF)
+@article{baladi2026osef_paper,
   author = {Baladi, Samir},
   title = {{Limit Cycle Flight Dynamics as a Framework for 
            Adaptive Aviation Safety Protocols}},
@@ -290,6 +292,16 @@ Validated on 1,247 commercial flights:
   publisher = {OSF},
   doi = {10.17605/OSF.IO/RJBDK},
   url = {https://doi.org/10.17605/OSF.IO/RJBDK}
+}
+
+% Preregistration (OSF)
+@misc{baladi2026osef_prereg,
+  author = {Baladi, Samir},
+  title = {{OSEF Framework Validation Study - Preregistration}},
+  year = {2026},
+  publisher = {OSF},
+  doi = {10.17605/OSF.IO/ED89G},
+  url = {https://doi.org/10.17605/OSF.IO/ED89G}
 }
 ```
 
