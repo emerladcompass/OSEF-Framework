@@ -319,6 +319,7 @@ python main.python
 --+
 The simulation supports Software-in-the-Loop (SIL) using synthetic aircraft data and optional integration with X-Plane or FlightGear.
 ## 🔮 Future Enhancements
+---
 Full X-Plane / FlightGear integration with live aircraft data.
 Advanced turbulence and gust models (Dryden / von Kármán spectra).
 Multi-axis joystick support and realistic pilot input simulation.
