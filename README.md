@@ -414,7 +414,9 @@ The simulation supports Software-in-the-Loop (SIL) using synthetic aircraft data
 ## 🔗 Resources
 
 - **PyPI Package**: [https://pypi.org/project/osef-framework/](https://pypi.org/project/osef-framework/)
-- **GitHub Repository**: [https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)
+- **GitHub / Gitlab Repository**: [https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)
+- [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/emerladcompass/OSEF-Framework)
+- [![GitLab](https://img.shields.io/badge/GitLab-Mirror-orange?logo=gitlab)](https://gitlab.com/cyber-constitution/aviation/OSEF-Framework)
 - **Documentation**: [https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
 - **Research Paper**: [https://doi.org/10.17605/OSF.IO/RJBDK](https://doi.org/10.17605/OSF.IO/RJBDK)
 - **Study Preregistration**: [https://doi.org/10.17605/OSF.IO/ED89G](https://doi.org/10.17605/OSF.IO/ED89G)
