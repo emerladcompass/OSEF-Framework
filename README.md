@@ -1,14 +1,15 @@
-# 🧭 OSEF: Operational Stability Envelope Framework
+# 🧭 # 🧭 OSEF: Operational Stability Envelope Framework
 
 [![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![DOI](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FRJBDK-blue)](https://doi.org/10.17605/OSF.IO/RJBDK)
+[![Preregistration](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FED89G-blue)](https://doi.org/10.17605/OSF.IO/ED89G)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-green)]()
 
 > **Real-Time Implementation Layer for Limit Cycle-Based Aviation Safety Models**
 
-OSEF translates validated limit cycle dynamics theory [[Baladi et al., 2025]](https://doi.org/10.17605/OSF.IO/RJBDK) into operational real-time supervision for aviation safety applications.
+OSEF translates validated limit cycle dynamics theory into operational real-time supervision for aviation safety applications.
 
 ---
 
@@ -27,6 +28,8 @@ Based on research analyzing **1,247 commercial flights** with **89.3% prediction
 
 > Baladi, S. (2026). *Limit Cycle Flight Dynamics as a Framework for Adaptive Aviation Safety Protocols*. OSF. https://doi.org/10.17605/OSF.IO/RJBDK
 
+**Validation Study Preregistered**: https://doi.org/10.17605/OSF.IO/ED89G
+
 ---
 
 ## ✨ **Key Features**
@@ -40,6 +43,7 @@ Based on research analyzing **1,247 commercial flights** with **89.3% prediction
 | **Training Mode** | Real-time feedback for simulator training | 🔄 In Progress |
 | **Fleet Analytics** | Aggregate safety metrics across flights | 📅 Planned |
 
+---
 ---
 ```
 📁 Repository Structure
@@ -126,34 +130,75 @@ OSEF-Framework/
 
 ```
 ---
+```markdown
+# 🧭 OSEF: Operational Stability Envelope Framework
+
+[![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![DOI](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FRJBDK-blue)](https://doi.org/10.17605/OSF.IO/RJBDK)
+[![Preregistration](https://img.shields.io/badge/DOI-10.17605%2FOSF.IO%2FED89G-blue)](https://doi.org/10.17605/OSF.IO/ED89G)
+[![Status](https://img.shields.io/badge/Status-Active%20Development-green)]()
+
+> **Real-Time Implementation Layer for Limit Cycle-Based Aviation Safety Models**
+
+OSEF translates validated limit cycle dynamics theory into operational real-time supervision for aviation safety applications.
+
+---
+
+## 🎯 **What is OSEF?**
+
+OSEF is a **computational framework** that:
+
+- 📊 **Monitors** aircraft trajectory in 3D phase space (Pitch, Bank, Power)
+- 🔍 **Detects** Creative Chaos Zones (CCZ) in real-time
+- 🎯 **Guides** crews toward stable Limit Cycle operations
+- ⚡ **Operates** at < 8 ms latency on standard hardware
+
+### **Built on Validated Science**
+
+Based on research analyzing **1,247 commercial flights** with **89.3% prediction accuracy**:
+
+> Baladi, S. (2026). *Limit Cycle Flight Dynamics as a Framework for Adaptive Aviation Safety Protocols*. OSF. https://doi.org/10.17605/OSF.IO/RJBDK
+
+**Validation Study Preregistered**: https://doi.org/10.17605/OSF.IO/ED89G
+
+---
+
+## ✨ **Key Features**
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **Real-Time CCZ Detection** | Identifies Creative Chaos Zones with 91.2% accuracy | ✅ Complete |
+| **Limit Cycle Guidance** | Provides trajectory corrections toward stable LC | ✅ Complete |
+| **Model-Agnostic Design** | Works with Van der Pol, ML, or hybrid models | ✅ Complete |
+| **Lyapunov Monitoring** | Continuous stability assessment (λ computation) | ✅ Complete |
+| **Training Mode** | Real-time feedback for simulator training | 🔄 In Progress |
+| **Fleet Analytics** | Aggregate safety metrics across flights | 📅 Planned |
+
+---
+
 ## 🚀 Quick Start
 
 ### 📦 Installation
 
-Install from PyPI (Recommended)
+**Install from PyPI (Recommended)**
 
+```bash
+pip install osef-framework
 ```
 
-osef-framework v0.1.0
-
-Install from source
+**Install from source**
 
 ```bash
 git clone https://github.com/emerladcompass/OSEF-Framework.git
 cd OSEF-Framework
-pip install -r requirements.txt  # Optional dependencies
-
-# OR using conda
-conda env create -f environment.yml
-conda activate osef
+pip install -e .
 ```
 
-✅ Available on PyPI: 
+### 💻 Basic Usage
 
-osef-framework v0.1.0
-
-💻 Basic Usage
-```
+```python
 from osef import LimitCycleModel, OSEF
 
 # Initialize Limit Cycle Model
@@ -171,95 +216,116 @@ print(f"State: {result['state']}")
 print(f"λ: {result['lambda']:.3f}")
 ```
 
-📊 Performance Metrics
+---
 
-Validated on the same dataset as [Baladi et al., 2025]:
-```
+## 📊 Performance Metrics
+
+Validated on 1,247 commercial flights:
+
 | Metric | Baladi (Offline) | OSEF (Real-Time) | Improvement |
-|---|---|---|---|
+|--------|------------------|------------------|-------------|
 | CCZ Detection Accuracy | 88.6% | 91.2% | +2.6% |
 | LC Recovery Prediction | 89.3% | 94.7% | +5.4% |
 | Processing Time | Post-flight | < 8 ms | Real-time ⚡ |
 | Memory Usage | N/A | 142 MB | Deployable |
-```
-🧪 Examples
 
-| Category | Item | Description / Command |
-| :--- | :--- | :--- |
-| **🧪 Examples** | **Flight Simulation** | `python examples/02_flight_simulation.py` <br> Simulates engine failure at $t=100s$, demonstrating CCZ detection and recovery guidance. |
-| | **QF32 Reconstruction** | `python examples/03_qf32_reconstruction.py` <br> Analysis of the Qantas Flight 32 incident using public FDR data. |
-| | **Training Mode** | `python examples/04_training_mode.py` <br> Interactive simulator training with real-time feedback. |
-| **📚 Documentation** | **Quick Start Guide** | Get started with the framework in 5 minutes. |
-| | **Architecture Overview** | Detailed system design and component breakdown. |
-| | **API Reference** | Complete technical documentation for all modules. |
-| | **Theoretical Foundation** | Deep dive into the underlying mathematical research. |
-| **🔬 Scientific Foundation** | **Limit Cycle Dynamics** | Based on Van der Pol oscillator patterns in 3D state space ($P, B, W$). |
-| | **Creative Chaos Zones** | Transitional stability regions where $0.01 < \lambda < 0.5$. |
-| | **Real-Time Supervision** | OSEF continuously monitors trajectory and provides guidance. |
+---
+
+## 🧪 Examples
+
+| Example | Description | Command |
+|---------|-------------|---------|
+| **Flight Simulation** | Simulates engine failure at t=100s | `python examples/02_flight_simulation.py` |
+| **QF32 Reconstruction** | Analysis of Qantas Flight 32 incident | `python examples/03_qf32_reconstruction.py` |
+| **Training Mode** | Interactive simulator with feedback | `python examples/04_training_mode.py` |
+
+---
+
+## 📚 Documentation
+
+- 🌐 **Website**: [https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
+- 📖 **Quick Start Guide**: Get started in 5 minutes
+- 🏗️ **Architecture Overview**: System design and components
+- 📋 **API Reference**: Complete technical documentation
+- 🔬 **Theoretical Foundation**: Mathematical research background
 
 ---
 
 ## 🌟 Community Recognition
 
-### Submitted to Awesome Lists:
+### Awesome Lists:
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
 
 1. **[Awesome Python](https://github.com/vinta/awesome-python/pull/2830)** - PR #2830
 2. **[Awesome Robotics](https://github.com/kiloreux/awesome-robotics/pull/82)** - PR #82  
-3. **[Awesome Scientific Computing](https://github.com/nschloe/awesome-scientific-computing/pull/100)**- PR #100
+3. **[Awesome Scientific Computing](https://github.com/nschloe/awesome-scientific-computing/pull/100)** - PR #100
 
-### PyPI Package:
-[![PyPI version](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
+### Distribution:
+[![PyPI](https://img.shields.io/pypi/v/osef-framework.svg)](https://pypi.org/project/osef-framework/)
 [![Downloads](https://static.pepy.tech/badge/osef-framework)](https://pepy.tech/projects/osef-framework)
-
-### Documentation:
-- 🌐 **Website**: [https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
-- 🐙 **GitHub**: [https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)
-- 📦 **PyPI**: [https://pypi.org/project/osef-framework/](https://pypi.org/project/osef-framework/)
-- 🔬 **Research**: [https://doi.org/10.17605/OSF.IO/RJBDK](https://doi.org/10.17605/OSF.IO/RJBDK)
 
 ---
 
-### 🎓 Citation
-OSEF Framework:
-```
+## 🎓 Citation
+
+### OSEF Framework:
+```bibtex
 @software{baladi2026osef,
   author = {Baladi, Samir},
-  title = {OSEF: Operational Stability Envelope Framework},
+  title = {{OSEF: Operational Stability Envelope Framework}},
   year = {2026},
-  url = {[https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)}
+  version = {0.1.2},
+  doi = {10.17605/OSF.IO/ED89G},
+  url = {https://github.com/emerladcompass/OSEF-Framework}
 }
+```
 
-```
-Foundational Research:
-```
+### Foundational Research:
+```bibtex
 @article{baladi2026limitcycle,
   author = {Baladi, Samir},
-  title = {Limit Cycle Flight Dynamics as a Framework for Adaptive Aviation Safety Protocols},
+  title = {{Limit Cycle Flight Dynamics as a Framework for 
+           Adaptive Aviation Safety Protocols}},
   year = {2026},
   publisher = {OSF},
   doi = {10.17605/OSF.IO/RJBDK},
-  url = {[https://doi.org/10.17605/OSF.IO/RJBDK](https://doi.org/10.17605/OSF.IO/RJBDK)}
+  url = {https://doi.org/10.17605/OSF.IO/RJBDK}
 }
 ```
 
 ---
-🚦 Project Status
-🟢 Active Development
+
+## 🚦 Project Status
+
+**🟢 Active Development**
+
 | Milestone | Status | Timeline | Key Deliverables |
-| :--- | :---: | :--- | :--- |
-| **Phase 1: Foundation** | ✅ | Q1 2026 | Core OSEF implementation & Real-time CCZ detection. |
-| **Phase 2: Validation** | 🔄 | Q2 2026 | Simulator integration (Level D FFS) & Pilot validation study ($N=30$). |
-| **Phase 3: Deployment** | 📅 | Q3-Q4 2026 | Avionics interface development & DO-178C compliance preparation. |
+|-----------|--------|----------|------------------|
+| **Phase 1: Foundation** | ✅ | Q1 2026 | Core OSEF implementation & Real-time CCZ detection |
+| **Phase 2: Validation** | 🔄 | Q2 2026 | Simulator integration & Pilot validation study (N=30) |
+| **Phase 3: Deployment** | 📅 | Q3-Q4 2026 | Avionics interface & DO-178C compliance prep |
 
 ---
 
-### 📜 License
+## 🔗 Resources
+
+- **PyPI Package**: [https://pypi.org/project/osef-framework/](https://pypi.org/project/osef-framework/)
+- **GitHub Repository**: [https://github.com/emerladcompass/OSEF-Framework](https://github.com/emerladcompass/OSEF-Framework)
+- **Documentation**: [https://osef-framework.netlify.app/](https://osef-framework.netlify.app/)
+- **Research Paper**: [https://doi.org/10.17605/OSF.IO/RJBDK](https://doi.org/10.17605/OSF.IO/RJBDK)
+- **Study Preregistration**: [https://doi.org/10.17605/OSF.IO/ED89G](https://doi.org/10.17605/OSF.IO/ED89G)
+- **OSF Project**: [https://osf.io/6c7d4/](https://osf.io/6c7d4/)
+
+---
+
+## 📜 License
+
 This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
 
 ---
 
-### 📊 Project Stats
+## 📊 Project Stats
+
 ![Repo Size](https://img.shields.io/github/repo-size/emerladcompass/OSEF-Framework)
 ![Issues](https://img.shields.io/github/issues/emerladcompass/OSEF-Framework)
 ![Forks](https://img.shields.io/github/forks/emerladcompass/OSEF-Framework)
@@ -268,4 +334,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE
 ---
 
 🧭 *"Where disciplines converge • Where patterns emerge • Where safety evolves"* 🧭
-
+```
